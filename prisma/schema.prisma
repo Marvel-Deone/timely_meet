@@ -1,0 +1,88 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String                @id @default(uuid())
+  clerk_user_id String                @unique
+  email       String                @unique
+  username    String                @unique
+  name        String?
+  image_url    String?
+  events      Event[]               @relation("UserEvents")
+  bookings    Booking[]             @relation("UserBookings")
+  availability  Availability[] 
+  created_at  DateTime              @default(now())
+  updated_at  DateTime              @updatedAt
+}
+
+model Event {
+  id          String    @id @default(uuid())
+  title       String
+  description String?
+  duration    Int
+  user_id      String
+  user        User      @relation("UserEvents", fields: [user_id], references: [id])
+  bookings    Booking[]
+  is_private   Boolean   @default(true)
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+}
+
+model Booking {
+  id              String   @id @default(uuid())
+  event_id         String
+  event           Event @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  user_id          String
+  user            User @relation("UserBookings", fields: [user_id], references: [id])
+  name            String
+  email           String
+  additional_info String?
+  start_time      DateTime @default(now())
+  end_time        DateTime
+  meet_link       String
+  google_event_id String
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+}
+
+model Availability {
+  id String @id @default(uuid())
+  user_id String @unique
+  user User @relation(fields: [user_id], references: [id])
+  time_gap Int
+  days DayAvailability[] @relation("UserDayAvailability")
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model DayAvailability {
+  id String @id @default(uuid())
+  availability_id String
+  availability Availability @relation("UserDayAvailability", fields: [availability_id], references: [id], onDelete: Cascade)
+  day DayOfWeek
+  start_time DateTime
+  end_time DateTime
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESSDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
