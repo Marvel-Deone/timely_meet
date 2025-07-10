@@ -7,6 +7,7 @@ import {
   ClerkProvider
 } from '@clerk/nextjs';
 import CreateEventDrawer from "@/components/ui/create-event";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "TimelyMeet",
@@ -32,10 +33,12 @@ export default function RootLayout({
           <Header />
           <main className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
             {children}
-             {/* <Toaster /> */}
+            {/* <Toaster /> */}
           </main>
           <Footer />
-          <CreateEventDrawer />
+          <Suspense fallback={null}>
+            <CreateEventDrawer />
+          </Suspense>
         </body>
       </html>
     </ClerkProvider>
