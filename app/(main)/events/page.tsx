@@ -30,7 +30,6 @@ const Events = async () => {
   let events: Event[] = [];
   let response: EventsResponse = { events: [], username: "" };
   if ('data' in res && res.data) {
-    console.log('events', typeof(res.data), 'AllRes', res.data);
     response = res.data as EventsResponse;
     events = await (res?.data?.events ?? []).map((event: any) => ({
       ...event,
@@ -42,10 +41,8 @@ const Events = async () => {
         <span>You haven&apos;t created any events yet.</span>
       </div>
     }
-    console.log('events', events);
     // You can use res.data here
   } else {
-    console.error('Error fetching events:', res);
     // setOpen(true);
     // setToasterType(res.success ? 'success' : 'error');
     // setMessage(

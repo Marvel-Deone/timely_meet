@@ -35,6 +35,6 @@ export const checkUser = async () => {
         });
         return newUser;
     } catch (err) {
-        console.log('err:', err);
+        console.error('err:', err);
     }
 }

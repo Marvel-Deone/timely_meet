@@ -35,7 +35,7 @@ const EventCard = ({ event, username, is_public }: EventCardProps) => {
             setIsCopied(true);
             setTimeout(() => setIsCopied(false), 2000);
         } catch (err) {
-            console.log('Failed to copy');
+            console.error('Failed to copy');
         }
     };
 
@@ -53,7 +53,6 @@ const EventCard = ({ event, username, is_public }: EventCardProps) => {
         setOpen(true);
         setIsOpen(false);
         setToasterType(res.success ? 'success' : 'error');
-        console.log('resdd:', res);
         setMessage(
             res.success ? (res as any)?.message ?? '' : res?.error?.message ?? 'An error occurred'
         );
