@@ -24,7 +24,7 @@ const CreateEventDrawer = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    const { register, handleSubmit, control, formState: { errors } } = useForm({
+    const { register, handleSubmit, control, formState: { errors }, reset } = useForm({
         resolver: zodResolver(eventSchema),
         defaultValues: {
             duration: 30,
@@ -58,6 +58,7 @@ const CreateEventDrawer = () => {
             result.success ? "Event Created Successfully" : result.error.message
         );
         if (!loading && !error) {
+            reset();
             handleClose();
             router.refresh();
         }
@@ -65,7 +66,10 @@ const CreateEventDrawer = () => {
 
     return (
         <>
-            <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <Dialog open={isOpen} onOpenChange={(open) => {
+                setIsOpen(open)
+                if (!open) handleClose();
+            }}>
                 <div className='flex flex-col gap-4'>
                     <DialogContent className="sm:max-w-[425px]">
                         <DialogHeader>

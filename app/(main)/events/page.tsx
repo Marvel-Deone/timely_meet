@@ -21,11 +21,6 @@ const EventsPage = () => {
 }
 
 const Events = async () => {
-  // const [open, setOpen] = useState<boolean>(false);
-  // const [message, setMessage] = useState<string>('');
-  // const [toasterType, setToasterType] = useState<AlertColor>('success');
-  // const [events, setEvents] = useState([]);
-
   const res = await getUserEvents();
   let events: Event[] = [];
   let response: EventsResponse = { events: [], username: "" };
@@ -36,18 +31,13 @@ const Events = async () => {
       description: event.description ?? "",
     }));
     if (events?.length === 0) {
-      return <div className="flex flex-col mt-1 gap-3 items-center justify-center w-[100%]">
-        <Image src="/images/empty_event.svg" alt="Notification" width={60} height={62} />
+      return <div className="flex flex-col mt-1 gap-3 items-center justify-center w-[100%] h-[70vh]">
+        <Image src="/images/empty_event.svg" alt="Notification" width={200} height={42} className="!w-[40%]" />
         <span>You haven&apos;t created any events yet.</span>
       </div>
     }
     // You can use res.data here
   } else {
-    // setOpen(true);
-    // setToasterType(res.success ? 'success' : 'error');
-    // setMessage(
-    //   res.success ? res.message : res.error.message
-    // );
   }
 
   return (
@@ -60,12 +50,6 @@ const Events = async () => {
           is_public={false}
         />
       ))}
-      {/* Snackbar */}
-      {/* <Toaster
-        open={open}
-        message={message}
-        type={toasterType}
-      /> */}
     </div>
   )
 }

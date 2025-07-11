@@ -22,11 +22,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <html lang="en">
-        <head>
-          <link rel="icon" href="/images/timely_meet_logo_dark.png" />
-        </head>
+    <html lang="en">
+      <head>
+        {/* <link rel="icon" href="/images/timely_meet_logo_dark.png" /> */}
+        <link rel="icon" href="/icon.png" />
+      </head>
+      <ClerkProvider>
         <body
           className={inter.className}
         >
@@ -40,7 +41,7 @@ export default function RootLayout({
             <CreateEventDrawer />
           </Suspense>
         </body>
-      </html>
-    </ClerkProvider>
+      </ClerkProvider>
+    </html >
   );
 }
