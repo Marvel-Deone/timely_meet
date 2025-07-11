@@ -63,7 +63,7 @@ const EventCard = ({ event, username, is_public }: EventCardProps) => {
 
     return (
         <>
-            <Card className='flex flex-col justify-between cursor-pointer'>
+            <Card className='flex flex-col justify-between rounded-xl shadow transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-lg cursor-pointer'>
                 <CardHeader>
                     <CardTitle className='text-2xl'>{event.title}</CardTitle>
                     <CardDescription className='flex justify-between'>
