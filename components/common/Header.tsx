@@ -11,7 +11,7 @@ const Header = async () => {
   await checkUser();
 
   return (
-    <nav className='py-4 px-4 flex mx-auto justify-between items-center shadow-md border-b-2'>
+    <nav className='w-full py-4 px-4 flex mx-auto justify-between items-center shadow-md border-b-2'>
       <Link href={"/"} className='flex items-center'>
         <Image src={"/images/timely_meet_logo_dark.png"} alt="logo" width={300} height={60} className='hidden md:flex !h-[60px] w-auto' />
         <Image src={"/images/mobile_logo.png"} alt="logo" width={140} height={20} className='flex md:hidden !h-[40px] w-auto' />
@@ -32,20 +32,6 @@ const Header = async () => {
         </SignedIn>
       </div>
     </nav>
-    // <header className="flex justify-end items-center p-4 gap-4 h-16">
-    //   <SignedOut>
-    //     <SignInButton />
-    //     <SignUpButton>
-    //       <button className="bg-[#6c47ff] text-white rounded-full font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 cursor-pointer">
-    //         Sign Up
-    //       </button>
-    //     </SignUpButton>
-    //   </SignedOut>
-    //   <SignedIn>
-    //     <UserButton />
-    //   </SignedIn>
-    // </header>
-
   )
 }
 

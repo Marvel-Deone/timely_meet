@@ -1,7 +1,8 @@
 import { getUserByUsername } from "@/actions/user";
-import EventCard from "@/components/dashboard/event-card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import Image from "next/image";
+// import EventCard from "@/components/dashboard/event-card";
+import UserProfile from "@/components/dashboard/user/UserProfile";
+// import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+// import Image from "next/image";
 import { notFound } from "next/navigation";
 
 export const generateMetadata = async ({ params }: { params: { username: string } }) => {
@@ -29,45 +30,57 @@ interface UserPageProps {
 const UserPage = async ({ params }: UserPageProps) => {
     const { username } = params;
     const user = await getUserByUsername(username);
-    console.log('user:', user);
 
     if (!user) {
         notFound();
     }
+    return <UserProfile user={user!} username={params.username} />;
+    // return (
+    //     <div className="container mx-auto px-4 py-8">
+    //         <motion.div
+    //             initial={{ opacity: 0, y: 20 }}
+    //             animate={{ opacity: 1, y: 0 }}
+    //             transition={{ duration: 0.6 }}
+    //             className="flex flex-col items-center gap-2 mb-6"
+    //         >
+    //             <img src={user?.image_url ?? ''} className="w-20 h-20 rounded-full shadow-md" />
+    //             <h2 className="text-xl font-semibold">Marvel pro</h2>
+    //             <p className="text-sm text-gray-600 text-center max-w-sm">
+    //                 Hey there 👋 — I’m Marvel. Select any of the events below to connect with me!
+    //             </p>
+    //         </motion.div>
 
-    return (
-        <div className="container mx-auto px-4 py-8">
-            <div className="flex flex-col items-center mb-8">
-                <Avatar className="w-24 h-24 mb-4 shadow-md">
-                    <AvatarImage src={user?.image_url ?? ''} alt={user?.name ?? ''} />
-                    <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
-                </Avatar>
-                <h1>{user.name}</h1>
-                <p>Hey there 👋 — I’m {user.name}. Select any of the events below to connect with me!</p>
-            </div>
+    //         <div className="flex flex-col items-center mb-8">
+    //             <Avatar className="w-24 h-24 mb-4 shadow-md">
+    //                 <AvatarImage src={user?.image_url ?? ''} alt={user?.name ?? ''} />
+    //                 <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
+    //             </Avatar>
+    //             <h1>{user.name}</h1>
+    //             <p>Hey there 👋 — I’m {user.name}. Select any of the events below to connect with me!</p>
+    //         </div>
 
-            {user?.events?.length === 0 ? (
-                <div className="flex flex-col mt-1 gap-3 items-center justify-center w-[100%] h-[70vh]">
-                    <Image src="/images/empty_event.svg" alt="Notification" width={200} height={42} className="!w-[40%]" />
-                    <span>No events yet. Please check back soon.</span>
-                </div>
-            ): (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md::grid-cols-3 gap-6">
-                    {user?.events.map((event) => (
-                        <EventCard
-                            key={event.id}
-                            event={{
-                                ...event,
-                                description: event.description ?? ""
-                            }}
-                            username={params.username}
-                            is_public
-                        />
-                    ))}
-                </div>
-            )}
-        </div>
-    )
+    //         {user?.events?.length === 0 ? (
+    //             <div className="flex flex-col mt-1 gap-3 items-center justify-center w-[100%] h-[70vh]">
+    //                 <Image src="/images/empty_event.svg" alt="Notification" width={200} height={42} className="!w-[40%]" />
+    //                 <span>No events yet. Please check back soon.</span>
+    //             </div>
+    //         ) : (
+    //             <div className="grid grid-cols-1 sm:grid-cols-2 md::grid-cols-3 gap-6">
+    //                 {user?.events.map((event) => (
+    //                     <EventCard
+    //                         key={event.id}
+    //                         event={{
+    //                             ...event,
+    //                             description: event.description ?? ""
+    //                         }}
+    //                         username={params.username}
+    //                         is_public
+    //                     />
+    //                 ))}
+    //             </div>
+    //         )}
+    //     </div>
+    // )
 }
 
 export default UserPage;

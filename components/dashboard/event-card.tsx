@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { Event } from '@/lib/types/event.types';
 import useFetch from '@/hooks/use-fetch';
 import { deleteEvent } from '@/actions/event';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../ui/alert-dialog';
+import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../ui/alert-dialog';
 import Toaster from './Toaster';
 import { AlertColor } from '@mui/material';
 
@@ -28,6 +28,12 @@ const EventCard = ({ event, username, is_public }: EventCardProps) => {
     const router = useRouter();
 
     const { loading, error, fn: fnDeleteEvent } = useFetch(deleteEvent);
+
+    const sortOptions = [
+        { label: "Newest", value: "newest" },
+        { label: "Most Booked", value: "bookings" },
+        { label: "Duration", value: "duration" },
+    ];
 
     const handleCopy = async () => {
         try {

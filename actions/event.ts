@@ -1,4 +1,4 @@
-'use server'
+'use server';
 
 import { eventSchema } from "@/app/lib/validators";
 import { db } from "@/lib/prisma";
@@ -77,3 +77,51 @@ export const deleteEvent = async (eventId: string) => {
 
     return success('Event deleted successfully');
 }
+
+export const getEventDetails = async (username: string, eventId: string) => {
+    const event = await db.event.findUnique({
+        where: {
+            id: eventId,
+            user: {
+                username
+            },
+        },
+        include: {
+            user: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    username: true,
+                    image_url: true,
+                },
+            },
+        },
+    });
+
+    return event;
+}
+
+export const getEvenAvailability = async (eventId: string) => {
+    const event = await db.event.findUnique({
+        where: { id: eventId },
+        include: {
+            user: {
+                include: {
+                    availability: {
+                        select: {
+                            days: true,
+                            time_gap: true,
+                        },
+                    },
+                    bookings: {
+                        select: {
+                            start_time: true,
+                            end_time: true,
+                        },
+                    },
+                },
+            },
+        },
+    });
+} 
