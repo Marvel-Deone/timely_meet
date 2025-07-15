@@ -1,5 +1,6 @@
 import { clerkClient, currentUser } from "@clerk/nextjs/server";
 import { db } from "./prisma";
+import { updateUsername } from "@/actions/user";
 
 
 export const checkUser = async () => {
@@ -33,6 +34,9 @@ export const checkUser = async () => {
                 username: name.split(" ").join("_") + user.id.slice(-4)
             }
         });
+
+        // const getUserByUsername = await updateUsername(newUser.username);
+        // console.log('Get user by username:', getUserByUsername);
         return newUser;
     } catch (err) {
         console.error('err:', err);

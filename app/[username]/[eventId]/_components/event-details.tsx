@@ -9,13 +9,13 @@ interface EventDetailsProps {
         title: string;
         description: string | null;
         duration: number;
-        userId: string;
+        user_id: string;
         is_private: boolean;
         user: {
             name: string | null;
             email: string;
             username: string;
-            imageUrl: string | null;
+            image_url: string | null;
         };
     };
 }
@@ -27,7 +27,7 @@ const EventDetails = ({ event }: EventDetailsProps) => {
             <h1 className="text-3xl font-bold mb-4">{event.title}</h1>
             <div className="flex items-center mb-4">
                 <Avatar className="w-12 h-12 mr-4">
-                    <AvatarImage src={user?.imageUrl ?? ''} alt={user?.name ?? ''} />
+                    <AvatarImage src={user?.image_url ?? ''} alt={user?.name ?? ''} />
                     <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div>

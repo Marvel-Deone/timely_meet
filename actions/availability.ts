@@ -1,8 +1,20 @@
 'use server';
 
+import { DayOfWeek } from "@/lib/generated/prisma";
 import { db } from "@/lib/prisma";
 import { error, success } from "@/utils/response";
-import { auth } from "@clerk/nextjs/server"
+import { auth } from "@clerk/nextjs/server";
+
+const dayKeyToEnum = {
+    monday: "MONDAY",
+    tuesday: "TUESDAY",
+    wednesday: "WEDNESDAY",
+    thursday: "THURSDAY",
+    friday: "FRIDAY",
+    saturday: "SATURDAY",
+    sunday: "SUNDAY",
+} as const;
+
 
 export const getUserAvailability = async () => {
     const { userId } = await auth();
@@ -50,7 +62,7 @@ export const getUserAvailability = async () => {
             end_time: data_availability ? data_availability.end_time.toISOString().slice(11, 16) : "17:00",
         }
     });
-    
+
     return availability_data;
 }
 
@@ -80,16 +92,32 @@ export const updateUserAvailability = async (data: UpdateAvailabilityData) => {
     }
 
     const availability_data = Object.entries(data).filter(([key]) => key !== "time_gap").flatMap(([daySchema, { is_available, start_time, end_time }]) => {
+        console.log('Hiisss');
+        
         if (is_available) {
+            console.log('Yesssss');
             base_date = new Date().toISOString().split('T')[0];
+            console.log('okkkkkkk');
+            const day = dayKeyToEnum[daySchema as keyof typeof dayKeyToEnum];
+            console.log('Checking');
+            if (!day) {
+                console.log('MyDaySchema:', daySchema);
+                console.log(`Invalid day key: ${daySchema}`);
+            }
+            console.log('Hisjj', day);
+            
             return [{
-                day: daySchema.toLocaleUpperCase() as any,
-                start_time: new Date(`${base_date}T${start_time}:00Z`),
-                end_time: new Date(`${base_date}T${end_time}:00Z`),
+                day,
+                // start_time: new Date(`${base_date}T${start_time}:00Z`),
+                start_time: new Date(`${base_date}T${start_time}:00`),
+                end_time: new Date(`${base_date}T${end_time}:00`),
             }];
         }
         return [];
     });
+
+    console.log('availability_data:', availability_data);
+
 
     if (user.availability.length > 0) {
         console.log('Updating existing availability');

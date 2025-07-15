@@ -12,7 +12,7 @@ type EventsResponse = {
 
 const EventsPage = () => {
   return (
-    <Suspense fallback={<div className="flex justify-center items-center h-[50vh]"><RiseLoader /></div>}>
+    <Suspense fallback={<div className="flex justify-center items-center h-[70vh]"><RiseLoader /></div>}>
       <Events />
     </Suspense>
   )
@@ -29,9 +29,9 @@ const Events = async () => {
       description: event.description ?? "",
     }));
     if (events?.length === 0) {
-      return <div className="flex flex-col mt-1 gap-3 items-center justify-center w-[100%] h-[50vh]">
+      return <div className="flex flex-col mt-1 gap-3 items-center justify-center w-[100%] h-[70vh]">
         <Image src="/images/empty_event.svg" alt="Notification" width={200} height={42} className="!w-[40%]" />
-        <span>You haven&apos;t created any events yet.</span>
+        <span className="mt-3 font-[600]">You haven&apos;t created any events yet.</span>
       </div>
     }
   }

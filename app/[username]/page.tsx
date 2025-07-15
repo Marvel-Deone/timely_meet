@@ -1,12 +1,11 @@
 import { getUserByUsername } from "@/actions/user";
-// import EventCard from "@/components/dashboard/event-card";
-import UserProfile from "@/components/dashboard/user/UserProfile";
-// import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-// import Image from "next/image";
+import UserProfile from "@/components/dashboard/user/User-profile";
 import { notFound } from "next/navigation";
 
+export const dynamic = 'force-dynamic';
+
 export const generateMetadata = async ({ params }: { params: { username: string } }) => {
-    const { username } = params;
+    const { username } = await params;
     const user = await getUserByUsername(username);
     if (!user) {
         return {
@@ -28,13 +27,13 @@ interface UserPageProps {
 }
 
 const UserPage = async ({ params }: UserPageProps) => {
-    const { username } = params;
+    const { username } = await params;
     const user = await getUserByUsername(username);
 
     if (!user) {
         notFound();
     }
-    return <UserProfile user={user!} username={params.username} />;
+    return <UserProfile user={user!} username={username} />;
     // return (
     //     <div className="container mx-auto px-4 py-8">
     //         <motion.div

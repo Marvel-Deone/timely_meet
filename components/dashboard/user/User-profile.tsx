@@ -50,9 +50,9 @@ const UserProfile = ({ user, username }: UserProfileProps) => {
             </motion.div>
 
             {user?.events?.length === 0 ? (
-                <div className="flex flex-col mt-1 gap-3 items-center justify-center w-[100%] h-[70vh]">
-                    <Image src="/images/empty_event.svg" alt="Notification" width={200} height={42} className="!w-[40%]" />
-                    <span>No events yet. Please check back soon.</span>
+                <div className="flex flex-col gap-5 mt-20 items-center w-[100%] h-[70vh]">
+                    <Image src="/images/public_event.svg" alt="Empty state illustration" width={200} height={38} className="!w-[300px] sm:!w-[400px] md:!w-[30%] shadow-md" />
+                    <span className="font-semibold mt-3">No events yet. Please check back soon.</span>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md::grid-cols-3 gap-6">

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import useFetch from "@/hooks/use-fetch";
 import { timeSlots } from "@/lib/consts/availability.data";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -43,6 +44,7 @@ const AvailabilityForm = ({ initialData }: AvailabilityFormProps) => {
     });
 
     const { fn: fnUpdateAvailability, loading, error } = useFetch(updateUserAvailability);
+    
     const handleToasterClose = () => setOpen(false);
 
     const onSubmit = async (data: {}) => {
@@ -53,6 +55,7 @@ const AvailabilityForm = ({ initialData }: AvailabilityFormProps) => {
             res.success ? ((res as { message?: string }).message) : res.error.message
         );
     }
+
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="md:border md:rounded-xl md:p-6 w-full">
@@ -120,7 +123,12 @@ const AvailabilityForm = ({ initialData }: AvailabilityFormProps) => {
             }
 
             <div className="mt-4 flex flex-col md:flex-row items-center justify-start gap-4 border border-gray-300 md:border-gray-200 rounded-xl p-2  md:ml-[185px]">
-                <span className="md:w-44">Minimum gap before booking (minutes):</span>
+                <Tooltip>
+                    <TooltipTrigger className="md:w-44">Minimum gap before booking (minutes):</TooltipTrigger>
+                    <TooltipContent>
+                        <p>How soon before a meeting someone can book. E.g. 30 = at least 30 mins ahead.</p>
+                    </TooltipContent>
+                </Tooltip>
                 <Input type="number" {...register("time_gap", {
                     valueAsNumber: true,
                 })} className="md:w-32" />
