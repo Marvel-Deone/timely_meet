@@ -13,8 +13,8 @@ const Meeting = () => {
     return (
         <Tabs defaultValue="upcoming">
             <TabsList>
-                <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
-                <TabsTrigger value="past">Past</TabsTrigger>
+                <TabsTrigger className="cursor-pointer" value="upcoming">Upcoming</TabsTrigger>
+                <TabsTrigger className="cursor-pointer" value="past">Past</TabsTrigger>
             </TabsList>
             <TabsContent value="upcoming">
                 <Suspense fallback={<div>Loading upcoming meetings...</div>}>
