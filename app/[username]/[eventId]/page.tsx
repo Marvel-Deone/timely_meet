@@ -5,50 +5,58 @@ import { Suspense } from "react";
 import { RiseLoader } from "react-spinners";
 import BookingForm from "./_components/booking-form";
 
-type EventPageProps = {
-    params: {
-        username: string;
-        eventId: string;
-    };
+type Params = {
+  username: string;
+  eventId: string;
 };
 
-export const generateMetadata = async ({ params }: {
-    params: { username: string; eventId: string };
+export const generateMetadata = async ({
+  params,
+}: {
+  params: Params;
 }) => {
-    const { username, eventId } = params;
-    const event = await getEventDetails(username, eventId);
+  const { username, eventId } = params;
+  const event = await getEventDetails(username, eventId);
 
-    if (!event) {
-        return {
-            title: "Event not found"
-        }
-    }
-
+  if (!event) {
     return {
-        title: `${event.title} with ${event.user.name} | TimelyMeet`,
-        description: `Schedule a ${event.duration}-minute ${event.title} event with ${event.user.name}.`,
-    }
-}
+      title: "Event not found",
+    };
+  }
 
-const EventPage = async ({ params }: {
-    params: { username: string; eventId: string };
+  return {
+    title: `${event.title} with ${event.user.name} | TimelyMeet`,
+    description: `Schedule a ${event.duration}-minute ${event.title} event with ${event.user.name}.`,
+  };
+};
+
+const EventPage = async ({
+  params,
+}: {
+  params: Params;
 }) => {
-    const { username, eventId } = params;
-    const event = await getEventDetails(username, eventId);
-    const availability = await getEventAvailability(eventId)
+  const { username, eventId } = params;
+  const event = await getEventDetails(username, eventId);
+  const availability = await getEventAvailability(eventId);
 
-    if (!event) {
-        notFound();
-    }
+  if (!event) {
+    notFound();
+  }
 
-    return (
-        <div className="flex flex-col lg:flex-row justify-center px-4 py-8">
-            <EventDetails event={event} />
-            <Suspense fallback={<div className="flex justify-center items-center h-[50vh]"><RiseLoader /></div>}>
-                <BookingForm event={event} availability={availability} />
-            </Suspense>
-        </div>
-    )
-}
+  return (
+    <div className="flex flex-col lg:flex-row justify-center px-4 py-8">
+      <EventDetails event={event} />
+      <Suspense
+        fallback={
+          <div className="flex justify-center items-center h-[50vh]">
+            <RiseLoader />
+          </div>
+        }
+      >
+        <BookingForm event={event} availability={availability} />
+      </Suspense>
+    </div>
+  );
+};
 
 export default EventPage;
