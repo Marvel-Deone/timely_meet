@@ -13,7 +13,7 @@ type EventPageProps = {
 };
 
 export const generateMetadata = async ({ params }: EventPageProps) => {
-    const { username, eventId } = await params;
+    const { username, eventId } = params;
     const event = await getEventDetails(username, eventId);
 
     if (!event) {
@@ -29,7 +29,7 @@ export const generateMetadata = async ({ params }: EventPageProps) => {
 }
 
 const EventPage = async ({ params }: EventPageProps) => {
-    const { username, eventId } = await params;
+    const { username, eventId } = params;
     const event = await getEventDetails(username, eventId);
     const availability = await getEventAvailability(eventId)
 
