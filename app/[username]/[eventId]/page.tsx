@@ -12,7 +12,9 @@ type EventPageProps = {
     };
 };
 
-export const generateMetadata = async ({ params }: EventPageProps) => {
+export const generateMetadata = async ({ params }: {
+    params: { username: string; eventId: string };
+}) => {
     const { username, eventId } = params;
     const event = await getEventDetails(username, eventId);
 
@@ -28,7 +30,9 @@ export const generateMetadata = async ({ params }: EventPageProps) => {
     }
 }
 
-const EventPage = async ({ params }: EventPageProps) => {
+const EventPage = async ({ params }: {
+    params: { username: string; eventId: string };
+}) => {
     const { username, eventId } = params;
     const event = await getEventDetails(username, eventId);
     const availability = await getEventAvailability(eventId)
