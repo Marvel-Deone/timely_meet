@@ -4,7 +4,14 @@ import { notFound } from "next/navigation";
 
 export const dynamic = 'force-dynamic';
 
-export const generateMetadata = async ({ params }: { params: { username: string } }) => {
+type UserPageProps = {
+    params: {
+        username: string,
+        [key: string]: any
+    }
+}
+
+export const generateMetadata = async ({ params }: UserPageProps) => {
     const { username } = await params;
     const user = await getUserByUsername(username);
     if (!user) {
@@ -16,13 +23,6 @@ export const generateMetadata = async ({ params }: { params: { username: string 
     return {
         title: `${user.name}'s Profile | TimelyMeet`,
         description: `Book an event with ${user.name}. View available public events and schedules.`
-    }
-}
-
-interface UserPageProps {
-    params: {
-        username: string,
-        [key: string]: any
     }
 }
 

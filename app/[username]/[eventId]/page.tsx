@@ -5,7 +5,14 @@ import { Suspense } from "react";
 import { RiseLoader } from "react-spinners";
 import BookingForm from "./_components/booking-form";
 
-export const generateMetadata = async ({ params }: { params: { username: string, eventId: string } }) => {
+type EventPageProps = {
+    params: {
+        username: string;
+        eventId: string;
+    };
+};
+
+export const generateMetadata = async ({ params }: EventPageProps) => {
     const { username, eventId } = await params;
     const event = await getEventDetails(username, eventId);
 
@@ -21,14 +28,7 @@ export const generateMetadata = async ({ params }: { params: { username: string,
     }
 }
 
-interface EventPageProps {
-    params: {
-        username: string;
-        eventId: string;
-    };
-}
-
-const EventPage = async ({ params }: { params: { username: string, eventId: string } }) => {
+const EventPage = async ({ params }: EventPageProps) => {
     const { username, eventId } = await params;
     const event = await getEventDetails(username, eventId);
     const availability = await getEventAvailability(eventId)
