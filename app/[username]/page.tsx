@@ -4,14 +4,11 @@ import { notFound } from "next/navigation";
 
 export const dynamic = 'force-dynamic';
 
-type UserPageProps = {
-    params: {
-        username: string,
-        [key: string]: any
-    }
-}
-
-export const generateMetadata = async ({ params }: UserPageProps) => {
+export const generateMetadata = async ({
+    params,
+}: {
+    params: Promise<{ username: string }>
+}) => {
     const { username } = await params;
     const user = await getUserByUsername(username);
     if (!user) {
@@ -26,7 +23,11 @@ export const generateMetadata = async ({ params }: UserPageProps) => {
     }
 }
 
-const UserPage = async ({ params }: UserPageProps) => {
+const UserPage = async ({
+    params,
+}: {
+    params: Promise<{ username: string }>
+}) => {
     const { username } = await params;
     const user = await getUserByUsername(username);
 

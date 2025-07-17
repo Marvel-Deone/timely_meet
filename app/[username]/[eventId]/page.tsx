@@ -1,41 +1,44 @@
+// app/[username]/[eventId]/page.tsx
+
 import { getEventAvailability, getEventDetails } from "@/actions/event";
 import { notFound } from "next/navigation";
 import EventDetails from "./_components/event-details";
+import BookingForm from "./_components/booking-form";
 import { Suspense } from "react";
 import { RiseLoader } from "react-spinners";
-import BookingForm from "./_components/booking-form";
+import type { Metadata } from "next";
 
-type Params = {
-  username: string;
-  eventId: string;
+type Props = {
+  params: {
+    username: string;
+    eventId: string;
+  };
 };
 
 export const generateMetadata = async ({
   params,
 }: {
-  params: Params;
+  params: Promise<{ username: string, eventId: string }>
 }) => {
-  const { username, eventId } = params;
+  const { username, eventId } = await params;
   const event = await getEventDetails(username, eventId);
 
   if (!event) {
-    return {
-      title: "Event not found",
-    };
+    return { title: "Event not found" };
   }
 
   return {
     title: `${event.title} with ${event.user.name} | TimelyMeet`,
     description: `Schedule a ${event.duration}-minute ${event.title} event with ${event.user.name}.`,
   };
-};
+}
 
 const EventPage = async ({
   params,
 }: {
-  params: Params;
+  params: Promise<{ username: string, eventId: string }>
 }) => {
-  const { username, eventId } = params;
+  const { username, eventId } = await params;
   const event = await getEventDetails(username, eventId);
   const availability = await getEventAvailability(eventId);
 
@@ -57,6 +60,5 @@ const EventPage = async ({
       </Suspense>
     </div>
   );
-};
-
+}
 export default EventPage;
