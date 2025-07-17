@@ -4,7 +4,7 @@ import { useState } from "react";
 type ToasterProps = {
   open: boolean;
   message: string;
-  type?: AlertColor; // 'success' | 'error' | 'info' | 'warning'
+  type?: AlertColor;
   autoHideDuration?: number;
   onClose?: () => void;
 };
@@ -13,7 +13,7 @@ const Toaster = ({
   open,
   message,
   type = "info",
-  autoHideDuration = 6000,
+  autoHideDuration = 5000,
   onClose,
 }: ToasterProps) => {
   // Internal fallback close handler
@@ -23,6 +23,7 @@ const Toaster = ({
     setInternalOpen(false);
     onClose?.(); // Call user-supplied one if it exists
   };
+
   return (
     <Snackbar
       open={onClose ? open : internalOpen}

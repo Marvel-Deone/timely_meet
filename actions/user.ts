@@ -30,3 +30,30 @@ export const updateUsername = async (username: string) => {
 
     return success("User profile updated successfully");
 };
+
+export const getUserByUsername = async (username: string) => {
+    const user = await db.user.findUnique({
+        where: { username },
+        select: {
+            id: true,
+            name: true,
+            email: true,
+            image_url: true,
+            events: {
+                where: { is_private: false },
+                select: {
+                    id: true,
+                    title: true,
+                    description: true,
+                    duration: true,
+                    is_private: true,
+                    _count: {
+                        select: { bookings: true }
+                    }
+                }
+            }
+        }
+    });
+
+    return user;
+}

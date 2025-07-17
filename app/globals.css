@@ -148,3 +148,7 @@
 .card-box-shadow:hover {
   transform: translateY(-4px) !important;
 }
+
+.checkbox-label {
+   transition: background-color 0.2s ease !important;
+}
