@@ -11,12 +11,12 @@ import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Button } from "../ui/button";
 import Toaster from "./Toaster";
+import { AlertColor } from "@mui/material";
 
 type EventFormProps = {
     onSumbitForm?: any;
 };
 
-type AlertColor = 'error' | 'info' | 'success' | 'warning';
 
 const EventForm: React.FC<EventFormProps> = ({ onSumbitForm }) => {
     const [open, setOpen] = useState<boolean>(false);

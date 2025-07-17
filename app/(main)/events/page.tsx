@@ -1,8 +1,6 @@
 import { getUserEvents } from "@/actions/event";
 import EventCard from "@/components/dashboard/event-card";
-import Toaster from "@/components/dashboard/Toaster";
 import { Event } from "@/lib/types/event.types";
-import { AlertColor } from "@mui/material";
 import Image from "next/image";
 import { Suspense } from "react";
 import { RiseLoader } from "react-spinners";
@@ -33,15 +31,13 @@ const Events = async () => {
     if (events?.length === 0) {
       return <div className="flex flex-col mt-1 gap-3 items-center justify-center w-[100%] h-[70vh]">
         <Image src="/images/empty_event.svg" alt="Notification" width={200} height={42} className="!w-[40%]" />
-        <span>You haven&apos;t created any events yet.</span>
+        <span className="mt-3 font-[600]">You haven&apos;t created any events yet.</span>
       </div>
     }
-    // You can use res.data here
-  } else {
   }
 
   return (
-    <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
+    <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
       {Array.isArray(events) && events.map((event) => (
         <EventCard
           key={event.id}

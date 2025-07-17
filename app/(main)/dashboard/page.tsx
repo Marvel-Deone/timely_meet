@@ -67,8 +67,8 @@ const Dashboard = () => {
 
                 <CardContent className="!-mt-2">
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                        <div className="flex gap-2">
-                            <div className="flex items-center gap-2">
+                        <div className="flex flex-col md:flex-row gap-3 md:gap-2">
+                            <div className="flex flex-col md:flex-row md:items-center gap-2">
                                 <span>{locationOrigin}</span>
                                 <Input {...register("username")} placeholder="username" className="!rounded-[8px] !py-5" />
                             </div>

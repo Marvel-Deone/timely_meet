@@ -3,12 +3,12 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Link, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Event } from '@/lib/types/event.types';
 import useFetch from '@/hooks/use-fetch';
 import { deleteEvent } from '@/actions/event';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../ui/alert-dialog';
+import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../ui/alert-dialog';
 import Toaster from './Toaster';
 import { AlertColor } from '@mui/material';
 
@@ -28,6 +28,12 @@ const EventCard = ({ event, username, is_public }: EventCardProps) => {
     const router = useRouter();
 
     const { loading, error, fn: fnDeleteEvent } = useFetch(deleteEvent);
+
+    const sortOptions = [
+        { label: "Newest", value: "newest" },
+        { label: "Most Booked", value: "bookings" },
+        { label: "Duration", value: "duration" },
+    ];
 
     const handleCopy = async () => {
         try {
@@ -61,9 +67,15 @@ const EventCard = ({ event, username, is_public }: EventCardProps) => {
         }
     }
 
+    const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
+        if ((e.target as HTMLElement).tagName !== 'BUTTON' && (e.target as HTMLElement).tagName !== 'SVG') {
+            window.open(`${username}/${event.id}`, '_blank');
+        }
+    }
+
     return (
         <>
-            <Card className='flex flex-col justify-between rounded-xl shadow transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-lg cursor-pointer'>
+            <Card className='flex flex-col justify-between rounded-xl shadow transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-lg cursor-pointer' onClick={handleCardClick}>
                 <CardHeader>
                     <CardTitle className='text-2xl'>{event.title}</CardTitle>
                     <CardDescription className='flex justify-between'>

@@ -16,9 +16,9 @@ const AppLayout = ({ children }: AppLayoutProps) => {
     return (
         <>
             {!isLoaded && <BarLoader width={"100%"} color="#36d7b7" />}
-            <div className='flex flex-col h-screen bg-blue-50 md:flex-row'>
+            <div className='w-full flex flex-col h-screen bg-blue-50 md:flex-row'>
                 <AppSideBar />
-                <main className="flex-1 overflow-y-auto p-4 md:p-8">
+                <main className="w-full flex-1 overflow-y-auto p-4 md:p-8">
                     <AppHeader />
                     {children}
                 </main>

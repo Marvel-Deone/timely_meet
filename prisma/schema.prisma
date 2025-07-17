@@ -80,7 +80,7 @@ model DayAvailability {
 enum DayOfWeek {
   MONDAY
   TUESDAY
-  WEDNESSDAY
+  WEDNESDAY
   THURSDAY
   FRIDAY
   SATURDAY
