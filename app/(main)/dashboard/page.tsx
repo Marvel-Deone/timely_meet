@@ -67,9 +67,9 @@ const Dashboard = () => {
 
                 <CardContent className="!-mt-2">
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                        <div className="flex flex-col md:flex-row gap-3 md:gap-2">
-                            <div className="flex flex-col md:flex-row md:items-center gap-2">
-                                <span>{locationOrigin}</span>
+                        <div className="flex flex-col md:flex-row gap-3 md:gap-2 w-full">
+                            <div className="flex flex-col md:flex-row md:items-center gap-2 w-[45%]">
+                                <span className="w-[55%]">{locationOrigin}</span>
                                 <Input {...register("username")} placeholder="username" className="!rounded-[8px] !py-5" />
                             </div>
                             {loading ? <Button disabled className="!bg-blue-600 cursor-pointer !rounded-[8px] !py-5">Updating...</Button> :
