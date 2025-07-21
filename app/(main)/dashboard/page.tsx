@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, Suspense } from "react"
+import { useState, useMemo, Suspense, useEffect } from "react"
 import {
     Calendar,
     Clock,
@@ -22,6 +22,7 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useUser } from "@clerk/nextjs"
 // import DashboardLayout from "@/components/dashboard-layout"
 
 const recentEvents = [
@@ -166,11 +167,21 @@ const RecentActivity = () => {
 }
 
 const DashboardPage = () => {
-    const [username, setUsername] = useState("dev_coder")
-    const [isEditing, setIsEditing] = useState(false)
+    const [username, setUsername] = useState("dev_coder");
+    const [locationOrigin, setLocationOrigin] = useState<string>();
+    const [isEditing, setIsEditing] = useState(false);
+
+    const { isLoaded, user } = useUser();
+
+    
+    useEffect(() => {
+        console.log('user:', user);
+        setLocationOrigin(window.location.origin);
+        // setValue("username", user?.username ?? "")
+    }, [isLoaded]);
 
     const copyLink = () => {
-        navigator.clipboard.writeText(`http://localhost:3000/${username}`)
+        navigator.clipboard.writeText(`${locationOrigin}/${username}`)
     }
 
     // Memoize the current date to prevent unnecessary re-renders
@@ -185,11 +196,11 @@ const DashboardPage = () => {
                 <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div className="flex items-center gap-4">
                         <Avatar className="w-12 h-12 md:w-16 md:h-16 ring-2 ring-white/20">
-                            <AvatarImage src="/placeholder.svg?height=64&width=64" />
-                            <AvatarFallback className="bg-white/20 text-white text-xl">M</AvatarFallback>
+                            <AvatarImage src={user?.imageUrl} alt={user?.firstName ?? ''}  />
+                            <AvatarFallback className="bg-white/20 text-white text-xl">{user?.firstName?.charAt(0)}</AvatarFallback>
                         </Avatar>
                         <div>
-                            <h1 className="text-2xl md:text-3xl font-bold mb-2">Welcome back, Marvel!</h1>
+                            <h1 className="text-2xl md:text-3xl font-bold mb-2">Welcome back, {user?.firstName}!</h1>
                             <p className="text-blue-100 text-sm md:text-base">Ready to manage your schedule efficiently?</p>
                         </div>
                     </div>
@@ -292,10 +303,10 @@ const DashboardPage = () => {
                                 <div className="flex-1 min-w-0">
                                     <div className="text-sm text-gray-600 mb-1">Your booking URL</div>
                                     <div className="font-mono text-sm bg-white px-3 py-2 rounded-lg border break-all">
-                                        http://localhost:3000/{username}
+                                        {locationOrigin}/{user?.username}
                                     </div>
                                 </div>
-                                <Button variant="outline" size="sm" onClick={copyLink} className="shrink-0 bg-transparent">
+                                <Button variant="outline" size="sm" onClick={copyLink} className="mt-6 shrink-0 bg-transparent cursor-pointer">
                                     <Copy className="w-4 h-4" />
                                 </Button>
                             </div>

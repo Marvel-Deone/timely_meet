@@ -5,6 +5,8 @@ import { Search, Plus, Bell, Menu, X, Calendar } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import UserMenu from "../common/UserMenu"
+import Link from "next/link"
 
 interface AppHeaderProps {
   onMobileMenuToggle?: () => void
@@ -50,17 +52,22 @@ const AppHeader = ({ onMobileMenuToggle, isMobileMenuOpen }: AppHeaderProps) => 
           </div>
 
           <div className="flex items-center gap-3">
-            <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg">
-              <Plus className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">Create Event</span>
-            </Button>
+            <Link href={"/events?create=true"}>
+              <Button className="cursor-pointer bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg">
+                <Plus className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">Create Event</span>
+              </Button>
+            </Link>
+
             <Button variant="ghost" size="icon" className="relative">
               <Bell className="w-4 h-4" />
               <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
             </Button>
             <Avatar className="w-8 h-8 ring-2 ring-blue-100">
               <AvatarImage src="/placeholder.svg?height=32&width=32" />
-              <AvatarFallback>M</AvatarFallback>
+              <AvatarFallback>
+                <UserMenu />
+              </AvatarFallback>
             </Avatar>
           </div>
         </div>
