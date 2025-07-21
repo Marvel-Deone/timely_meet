@@ -4,19 +4,19 @@ export const features = [
     {
         icon: Calendar,
         title: "Create Events",
-        description: "Easily set up and customize your event types",
+        description: "Easily set up and customize your event types with flexible scheduling options.",
     },
     {
         icon: Clock,
         title: "Manage Availability",
-        description: "Define your availability to streamline scheduling",
+        description: "Define your availability to streamline scheduling and avoid conflicts.",
     },
     {
         icon: LinkIcon,
         title: "Custom Links",
-        description: "Share your personalized scheduling link",
+        description: "Share your personalized scheduling link and let others book time with you.",
     },
-];
+]
 
 export const howItWorks = [
     { step: "Sign Up", description: "Create your free TimelyMeet account" },
