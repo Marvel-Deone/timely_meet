@@ -1,4 +1,4 @@
-import { Calendar, Clock, LinkIcon } from "lucide-react";
+import { Calendar, Clock, LinkIcon, Settings, Share2, Zap } from "lucide-react";
 
 export const features = [
     {
@@ -33,6 +33,41 @@ export const howItWorks = [
         description: "Receive confirmations for new appointments automatically",
     },
 ];
+
+export const workflowSteps = [
+    {
+        id: 1,
+        title: "Set Your Availability",
+        description: "Define when you're free with flexible time blocks and preferences",
+        icon: Settings,
+        color: "from-blue-500 to-cyan-500",
+        details: "Smart calendar integration syncs your existing schedule automatically",
+    },
+    {
+        id: 2,
+        title: "Create Event Types",
+        description: "Design different meeting types with custom durations and settings",
+        icon: Calendar,
+        color: "from-purple-500 to-pink-500",
+        details: "15-min coffee chats to 2-hour strategy sessions - you control it all",
+    },
+    {
+        id: 3,
+        title: "Share Your Link",
+        description: "Send your personalized booking link via email, social, or embed it",
+        icon: Share2,
+        color: "from-green-500 to-emerald-500",
+        details: "Beautiful branded booking pages that reflect your professional image",
+    },
+    {
+        id: 4,
+        title: "Get Booked Seamlessly",
+        description: "Automatic confirmations, reminders, and calendar invites handle the rest",
+        icon: Zap,
+        color: "from-orange-500 to-red-500",
+        details: "Zero back-and-forth emails. Just smooth, professional scheduling",
+    },
+]
 
 export const testimonials = [
     {
