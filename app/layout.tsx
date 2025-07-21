@@ -31,7 +31,7 @@ export default function RootLayout({
         <body
           className={inter.className}
         >
-          <Header />
+          {/* <Header /> */}
           <main className="min-h-screen w-full bg-gradient-to-b from-blue-50 to-white">
             {children}
             {/* <Toaster /> */}

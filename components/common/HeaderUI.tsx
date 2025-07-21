@@ -24,7 +24,7 @@ const HeaderUI = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-8">
+          {/* <nav className="hidden lg:flex items-center space-x-8">
             <Link
               href="#features"
               className="text-gray-600 hover:text-blue-600 font-medium transition-colors duration-200 hover:scale-105 transform"
@@ -43,7 +43,7 @@ const HeaderUI = () => {
             >
               Testimonials
             </Link>
-          </nav>
+          </nav> */}
 
           {/* Desktop CTA */}
           <div className="hidden lg:flex items-center space-x-4">
