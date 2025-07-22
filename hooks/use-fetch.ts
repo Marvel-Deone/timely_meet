@@ -1,38 +1,6 @@
 import { ErrorResponse, SuccessResponse } from "@/utils/response";
 import { useState } from "react";
 
-type AppError = {
-    message: string;
-    code?: number;
-    status?: string;
-};
-
-
-// const useFetch = (cb: (...args: any[]) => Promise<any>) => {
-//     const [data, setData] = useState<any>();
-//     const [loading, setLoading] = useState<boolean>(false);
-//     const [error, setError] = useState<any>(null);
-
-//     const fn = async (...args: any[]) => {
-//         setLoading(true);
-//         setError(null);
-
-//         try {
-//             const response = await cb(...args);
-//             setData(response);
-//             setError(null);
-//             return response;
-//         } catch (err) {
-//             setError(err);
-//             return err;
-//         } finally {
-//             setLoading(false);
-//         }
-//     };
-
-//     return { data, loading, error, fn };
-// }
-
 const useFetch = <T = unknown>(cb: (...args: any[]) => Promise<SuccessResponse<T> | ErrorResponse>) => {
     const [data, setData] = useState<T | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
@@ -68,6 +36,5 @@ const useFetch = <T = unknown>(cb: (...args: any[]) => Promise<SuccessResponse<T
 
     return { data, loading, error, fn };
 };
-
 
 export default useFetch;

@@ -8,6 +8,7 @@ import {
 } from '@clerk/nextjs';
 import CreateEventDrawer from "@/components/ui/create-event";
 import { Suspense } from "react";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "TimelyMeet",
@@ -31,9 +32,10 @@ export default function RootLayout({
         <body
           className={inter.className}
         >
-          {/* <Header /> */}
+          <Header />
           <main className="min-h-screen w-full bg-gradient-to-b from-blue-50 to-white">
             {children}
+             <Toaster position="top-right" richColors />
             {/* <Toaster /> */}
           </main>
           <Footer />
