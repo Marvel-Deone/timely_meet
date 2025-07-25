@@ -15,14 +15,14 @@ interface AppHeaderProps {
 
 const AppHeader = ({ onMobileMenuToggle, isMobileMenuOpen }: AppHeaderProps) => {
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200 md:pl-64">
+    <header className="bg-white shadow-sm border-b border-gray-200 lg:pl-64">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             {/* Mobile menu button */}
             <button
               type="button"
-              className="md:hidden -ml-0.5 -mt-0.5 h-12 w-12 inline-flex items-center justify-center rounded-md text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+              className="cursor-pointer lg:hidden -ml-0.5 -mt-0.5 h-12 w-12 inline-flex items-center justify-center rounded-md text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
               onClick={onMobileMenuToggle}
             >
               <span className="sr-only">Open sidebar</span>
@@ -30,7 +30,7 @@ const AppHeader = ({ onMobileMenuToggle, isMobileMenuOpen }: AppHeaderProps) => 
             </button>
 
             {/* Mobile logo */}
-            <div className="md:hidden ml-4 flex items-center gap-2">
+            <div className="lg:hidden ml-4 flex items-center gap-2">
               <div className="w-6 h-6 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-md flex items-center justify-center">
                 <Calendar className="w-3 h-3 text-white" />
               </div>
@@ -52,10 +52,10 @@ const AppHeader = ({ onMobileMenuToggle, isMobileMenuOpen }: AppHeaderProps) => 
           </div>
 
           <div className="flex items-center gap-3">
-            <Link href={"/events?create=true"}>
+            <Link className="md:inline" href={"/events?create=true"}>
               <Button className="cursor-pointer bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg">
-                <Plus className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Create Event</span>
+                <Plus className="w-4 h-4 mr-2 md:ml-2 lg:ml-0" />
+                <span className="hidden lg:inline">Create Event</span>
               </Button>
             </Link>
 

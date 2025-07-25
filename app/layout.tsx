@@ -17,33 +17,34 @@ export const metadata: Metadata = {
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function RootLayout({
+const RootLayout = ({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>) {
+}>) => {
   return (
     <html lang="en">
       <head>
         {/* <link rel="icon" href="/images/timely_meet_logo_dark.png" /> */}
         <link rel="icon" href="/icon.png" />
       </head>
-      <ClerkProvider>
-        <body
-          className={inter.className}
-        >
-          <Header />
-          <main className="min-h-screen w-full bg-gradient-to-b from-blue-50 to-white">
+      <body
+        className={inter.className}
+      >
+        <ClerkProvider>
+          {/* <Header /> */}
+          {/* <main className="min-h-screen w-full bg-gradient-to-b from-blue-50 to-white"> */}
             {children}
-             <Toaster position="top-right" richColors />
-            {/* <Toaster /> */}
-          </main>
-          <Footer />
+            <Toaster position="top-right" richColors />
+          {/* </main> */}
+          {/* <Footer /> */}
           <Suspense fallback={null}>
             <CreateEventDrawer />
           </Suspense>
-        </body>
-      </ClerkProvider>
-    </html >
+        </ClerkProvider>
+      </body>
+    </html>
   );
 }
+
+export default RootLayout;

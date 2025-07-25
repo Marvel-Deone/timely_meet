@@ -20,10 +20,10 @@ const MobileSidebar = ({ isOpen, onClose }: MobileSidebarProps) => {
   return (
     <>
       {/* Overlay */}
-      <div className="fixed inset-0 z-40 bg-gray-600 bg-opacity-75 md:hidden" onClick={onClose} />
+      <div className="fixed inset-0 z-40 bg-gray-600/75 bg-opacity-75 lg:hidden" onClick={onClose} />
 
       {/* Sidebar */}
-      <div className="fixed inset-y-0 left-0 z-50 w-64 bg-white md:hidden">
+      <div className="fixed inset-y-0 left-0 z-50 w-64 bg-white lg:hidden">
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
@@ -35,7 +35,7 @@ const MobileSidebar = ({ isOpen, onClose }: MobileSidebarProps) => {
                 TimelyMeet
               </span>
             </div>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <button onClick={onClose} className="cursor-pointer text-gray-400 hover:text-gray-600">
               <X className="w-6 h-6" />
             </button>
           </div>
