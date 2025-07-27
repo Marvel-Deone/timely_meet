@@ -5,20 +5,22 @@ import { eventSchema } from "@/app/lib/validators";
 import useFetch from "@/hooks/use-fetch";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Button } from "../ui/button";
 import Toaster from "./Toaster";
 import { AlertColor } from "@mui/material";
+import { toast } from "sonner";
 
 type EventFormProps = {
     onSumbitForm?: any;
+    onEventCreated?: () => void;
 };
 
 
-const EventForm: React.FC<EventFormProps> = ({ onSumbitForm }) => {
+const EventForm: React.FC<EventFormProps> = ({ onSumbitForm, onEventCreated }) => {
     const [open, setOpen] = useState<boolean>(false);
     const [message, setMessage] = useState<string>('');
     const [toasterType, setToasterType] = useState<AlertColor>('success');
@@ -37,16 +39,50 @@ const EventForm: React.FC<EventFormProps> = ({ onSumbitForm }) => {
 
     const { loading, error, fn: fnCreateEvent } = useFetch(createEvent);
 
-    const onSubmit = async (data: typeof eventSchema._type) => {
-        const result = await fnCreateEvent(data);
-        setOpen(true);
-        setToasterType(result.success ? 'success' : 'error');
-        setMessage(
-            result.success ? "Username updated successfully" : result.error.message
-        );
-        if (!loading && !error && onSumbitForm) onSumbitForm();
-        router.refresh();
-    }
+
+      const handleDeleteConfirm = useCallback(async (data: any) => {
+        try {
+          const res = await fnCreateEvent(data);
+          if (res?.success) {
+            console.log('red', res);
+            
+            // toast.success(res?.message);
+            onEventCreated?.();
+          } else {
+            toast.error(res?.error?.message || "Failed to create event.")
+          }
+        } catch (err) {
+          toast.error("An unexpected error occurred");
+        }
+      }, [fnCreateEvent, onEventCreated]);
+
+    const onSubmit = useCallback(async (data: typeof eventSchema._type) => {
+        // const result = await fnCreateEvent(data);
+        // setOpen(true);
+        // setToasterType(result.success ? 'success' : 'error');
+        // toast.success("Event deleted successfully!")
+        // setMessage(
+        //     result.success ? "Username updated successfully" : result.error.message
+        // );
+        // if (!loading && !error && onSumbitForm) onSumbitForm();
+        // router.refresh();
+         try {
+            console.log('Try');
+            
+          const res = await fnCreateEvent(data);
+          if (res?.success) {
+            console.log('red', res);
+            
+            // toast.success(res?.message);
+            onEventCreated?.();
+          } else {
+            toast.error(res?.error?.message || "Failed to create event.")
+          }
+        } catch (err) {
+          toast.error("An unexpected error occurred");
+        }
+      }, [fnCreateEvent, onEventCreated]);
+    // }
 
     return (
         <form className='flex flex-col gap-4' onSubmit={handleSubmit(onSubmit)}>
@@ -55,11 +91,11 @@ const EventForm: React.FC<EventFormProps> = ({ onSumbitForm }) => {
                 <Input id='title' {...register("title")} className='mt-1' />
                 {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
             </div>
-            <div>
+            {/* <div>
                 <label htmlFor="description" className='block text-sm font-medium text-gray-700'>Event description</label>
                 <Input id='description' {...register("description")} className='mt-1' />
                 {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
-            </div>
+            </div> */}
             <div>
                 <label htmlFor="description" className='block text-sm font-medium text-gray-700'>Duration (minutes)</label>
                 <Input id='duration' {...register("duration", {

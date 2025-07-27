@@ -1,258 +1,135 @@
-"use client"
+"use client";
 
-import { Suspense, useEffect, useState } from "react"
-import { Calendar, Clock, Users, Link, Trash2, Plus, Search, MoreVertical, Eye, Edit, Globe, Lock } from "lucide-react"
+import React from "react";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { toast } from "sonner"
-import { BarLoader, RiseLoader } from "react-spinners"
-import { getUserEvents } from "@/actions/event"
-import { Event } from "@/lib/types/event.types"
-import Image from "next/image"
-import useFetch from "@/hooks/use-fetch"
-// import DashboardLayout from "@/components/dashboard-layout"
+import { useEffect, useState, useMemo, useCallback } from "react";
+import { Calendar, Clock, Users, Plus, Search, Globe } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { RiseLoader } from "react-spinners";
+import { getUserEvents } from "@/actions/event";
+import type { Event } from "@/lib/types/event.types";
+import Image from "next/image";
+import useFetch from "@/hooks/use-fetch";
+import EventCard from "@/components/dashboard/event-card";
 
-type EventsResponse = {
-  events: Event[];
-  username: string;
-};
+type FilterType = "all" | "public" | "private" | "active";
 
-// Function to generate consistent color based on event properties
-const generateEventColor = (event: Event): string => {
-  const colors = ["blue", "green", "purple", "orange", "pink", "indigo", "teal", "red"]
-
-  // Create a simple hash from the event ID to ensure consistency
-  let hash = 0
-  for (let i = 0; i < event.id.length; i++) {
-    const char = event.id.charCodeAt(i)
-    hash = (hash << 5) - hash + char
-    hash = hash & hash // Convert to 32-bit integer
-  }
-
-  // Use absolute value and modulo to get a consistent index
-  const colorIndex = Math.abs(hash) % colors.length
-  return colors[colorIndex]
+interface EventsResponse {
+  events: Event[]
+  username: string
 }
 
-// Mock data - replace with your actual data
-// const events = [
-//   {
-//     id: 1,
-//     title: "Testing",
-//     description: "Testing",
-//     duration: 40,
-//     isPublic: false,
-//     bookings: 2,
-//     color: "blue",
-//   },
-//   {
-//     id: 2,
-//     title: "1:1 Discussion",
-//     description: "Discuss about anything",
-//     duration: 45,
-//     isPublic: true,
-//     bookings: 0,
-//     color: "green",
-//   },
-//   {
-//     id: 3,
-//     title: "Does Professionalism really matters?",
-//     description: "Does Professionalism really matters in tech?",
-//     duration: 45,
-//     isPublic: true,
-//     bookings: 2,
-//     color: "purple",
-//   },
-// ]
-
-const EventCard = ({ event }: { event: Event }) => {
-  const copyLink = () => {
-    navigator.clipboard.writeText(`${window.location.origin}/event/${event.id}`)
-    toast.success("Event link copied to clipboard!")
-  }
-
-  const deleteEvent = () => {
-    toast.success("Event deleted successfully!")
-  }
-
-  const getColorClasses = (color: string) => {
-    const colors = {
-      blue: "from-blue-500 to-indigo-500",
-      green: "from-green-500 to-emerald-500",
-      purple: "from-purple-500 to-pink-500",
-      orange: "from-orange-500 to-red-500",
-      pink: "from-pink-500 to-rose-500",
-      indigo: "from-indigo-500 to-purple-500",
-      teal: "from-teal-500 to-cyan-500",
-      red: "from-red-500 to-pink-500",
-    }
-    return colors[color as keyof typeof colors] || colors.blue
-  }
-
-  return (
-    <Card className="group hover:shadow-lg transition-all duration-200 border-0 bg-white/60 backdrop-blur-sm">
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${getColorClasses(generateEventColor(event))}`} />
-            <div className="flex-1 min-w-0">
-              <CardTitle className="text-lg font-semibold text-gray-900 truncate">{event.title}</CardTitle>
-              <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
-                <div className="flex items-center gap-1">
-                  <Clock className="w-4 h-4" />
-                  {event.duration} mins
-                </div>
-                <div className="flex items-center gap-1">
-                  {event.is_private ? (
-                    <>
-                      <Globe className="w-4 h-4" />
-                      Public
-                    </>
-                  ) : (
-                    <>
-                      <Lock className="w-4 h-4" />
-                      Private
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity">
-                <MoreVertical className="w-4 h-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem>
-                <Eye className="w-4 h-4 mr-2" />
-                View Details
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Edit className="w-4 h-4 mr-2" />
-                Edit Event
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-600" onClick={deleteEvent}>
-                <Trash2 className="w-4 h-4 mr-2" />
-                Delete Event
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </CardHeader>
-      <CardContent className="pt-0">
-        <CardDescription className="text-sm text-gray-600 mb-4 line-clamp-2">{event.description}</CardDescription>
-
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 text-sm text-gray-600">
-              <Users className="w-4 h-4" />
-              <span className="font-medium">{event._count.bookings}</span>
-              <span>booking{event._count.bookings !== 1 ? "s" : ""}</span>
-            </div>
-            {event._count.bookings > 0 && (
-              <div className="flex -space-x-1">
-                {Array.from({ length: Math.min(event._count.bookings, 3) }).map((_, i) => (
-                  <Avatar key={i} className="w-6 h-6 border-2 border-white">
-                    <AvatarFallback className="text-xs bg-gray-100">{String.fromCharCode(65 + i)}</AvatarFallback>
-                  </Avatar>
-                ))}
-                {event._count.bookings > 3 && (
-                  <div className="w-6 h-6 rounded-full bg-gray-100 border-2 border-white flex items-center justify-center text-xs text-gray-600">
-                    +{event._count.bookings - 3}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={copyLink} className="bg-transparent">
-              <Link className="w-4 h-4" />
-            </Button>
-            <Badge variant={event._count.bookings > 0 ? "default" : "secondary"} className="capitalize">
-              {event._count.bookings > 0 ? "Active" : "No bookings"}
-            </Badge>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
-
-const EventsPage = () => {
-  return (
-    <Suspense fallback={<div className="w-full"><BarLoader /></div>}>
-      <Events />
-    </Suspense>
-  )
+interface EventStats {
+  total: number
+  totalBookings: number
+  publicEvents: number
+  activeEvents: number
 }
 
 const Events = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filterType, setFilterType] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("")
+  const [filterType, setFilterType] = useState<FilterType>("all")
 
-  const { data: userEvents, loading, error, fn: fetchUserEvents } = useFetch(getUserEvents);
+  const { data: userEvents, loading, error, fn: fetchUserEvents } = useFetch<EventsResponse>(getUserEvents)
 
   useEffect(() => {
     fetchUserEvents();
-  }, []);
+  }, [fetchUserEvents]);
 
-  const myevents = userEvents;
+  // Memoize processed events data
+  const processedData = useMemo(() => {
+    if (!userEvents?.events) {
+      return { events: [], username: "", stats: { total: 0, totalBookings: 0, publicEvents: 0, activeEvents: 0 } }
+    }
 
-  console.log('events', myevents);
-
-
-  // const res = getUserEvents();
-  let events: Event[] = [];
-  let response: EventsResponse = { events: [], username: "" };
-  if (myevents?.events) {
-    events = (myevents?.events ?? []).map((event: any) => ({
+    const events: Event[] = userEvents.events.map((event: any) => ({
       ...event,
       description: event.description ?? "",
     }));
-    // response = res.data as EventsResponse;
-    // events = await (res?.data?.events ?? []).map((event: any) => ({
-    //   ...event,
-    //   description: event.description ?? "",
-    // }));
-    if (events?.length === 0) {
-      return <div className="flex flex-col mt-1 gap-3 items-center justify-center w-[100%] h-[70vh]">
-        <Image src="/images/empty_event.svg" alt="Notification" width={200} height={42} className="!w-[40%]" />
-        <span className="mt-3 font-[600]">You haven&apos;t created any events yet.</span>
-      </div>
+
+    const stats: EventStats = {
+      total: events.length,
+      totalBookings: events.reduce((sum, event) => sum + event._count.bookings, 0),
+      publicEvents: events.filter((e) => !e.is_private).length,
+      activeEvents: events.filter((e) => e._count.bookings > 0).length,
     }
+
+    return {
+      events,
+      username: userEvents.username,
+      stats,
+    }
+  }, [userEvents])
+
+  // Memoize filtered events
+  const filteredEvents = useMemo(() => {
+    return processedData.events.filter((event) => {
+      const description = (event.description ?? "").toLowerCase();
+
+      const matchesSearch =
+        searchQuery === "" ||
+        event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        description.includes(searchQuery.toLowerCase());
+
+      const matchesFilter =
+        filterType === "all" ||
+        (filterType === "public" && !event.is_private) ||
+        (filterType === "private" && event.is_private) ||
+        (filterType === "active" && event._count.bookings > 0)
+
+      return matchesSearch && matchesFilter
+    })
+  }, [processedData.events, searchQuery, filterType]);
+
+  // Memoize search handler
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value)
+  }, [])
+
+  // Memoize filter handlers
+  const handleFilterChange = useCallback((filter: FilterType) => {
+    setFilterType(filter)
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="w-full py-10 flex justify-center items-center h-[70vh]">
+        <RiseLoader color="#6366f1" />
+      </div>
+    )
   }
 
-  const filteredEvents = events.filter((event) => {
-    const matchesSearch =
-      event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      event.description.toLowerCase().includes(searchQuery.toLowerCase())
+  if (error) {
+    return <div className="w-full py-10 text-center text-red-500">Failed to load events. Please try again later.</div>
+  }
 
-    const matchesFilter =
-      filterType === "all" ||
-      (filterType === "public" && event.is_private) ||
-      (filterType === "private" && !event.is_private) ||
-      (filterType === "active" && event._count.bookings > 0)
+  if (processedData.events.length === 0) {
+    return (
+      <Card className="bg-white border shadow-sm">
+        <CardContent className="p-8 text-center">
+          <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">No events found</h3>
+          <p className="text-gray-600 mb-4">
+            {searchQuery || filterType !== "all"
+              ? "Try adjusting your search or filter criteria"
+              : "Get started by creating your first event"}
+          </p>
+          {!searchQuery && filterType === "all" && (
+            <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white">
+              <Plus className="w-4 h-4 mr-2" />
+              Create Your First Event
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+    )
+  }
 
-    return matchesSearch && matchesFilter
-  })
+  const { stats } = processedData
 
   return (
-    // <DashboardLayout>
     <div className="space-y-6">
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -264,67 +141,10 @@ const Events = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-        <Card className="bg-white border shadow-sm">
-          <CardContent className="p-4 md:p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Events</p>
-                <p className="text-2xl md:text-3xl font-bold text-gray-900">{events.length}</p>
-              </div>
-              <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-500 rounded-xl flex items-center justify-center">
-                <Calendar className="w-5 h-5 md:w-6 md:h-6 text-white" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white border shadow-sm">
-          <CardContent className="p-4 md:p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Bookings</p>
-                <p className="text-2xl md:text-3xl font-bold text-gray-900">
-                  {events.reduce((sum, event) => sum + event._count.bookings, 0)}
-                </p>
-              </div>
-              <div className="w-10 h-10 md:w-12 md:h-12 bg-green-500 rounded-xl flex items-center justify-center">
-                <Users className="w-5 h-5 md:w-6 md:h-6 text-white" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white border shadow-sm">
-          <CardContent className="p-4 md:p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Public Events</p>
-                <p className="text-2xl md:text-3xl font-bold text-gray-900">
-                  {events.filter((e) => e.is_private).length}
-                </p>
-              </div>
-              <div className="w-10 h-10 md:w-12 md:h-12 bg-purple-500 rounded-xl flex items-center justify-center">
-                <Globe className="w-5 h-5 md:w-6 md:h-6 text-white" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white border shadow-sm">
-          <CardContent className="p-4 md:p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Active Events</p>
-                <p className="text-2xl md:text-3xl font-bold text-gray-900">
-                  {events.filter((e) => e._count.bookings > 0).length}
-                </p>
-              </div>
-              <div className="w-10 h-10 md:w-12 md:h-12 bg-orange-500 rounded-xl flex items-center justify-center">
-                <Clock className="w-5 h-5 md:w-6 md:h-6 text-white" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <StatsCard title="Total Events" value={stats.total} icon={Calendar} bgColor="bg-blue-500" />
+        <StatsCard title="Total Bookings" value={stats.totalBookings} icon={Users} bgColor="bg-green-500" />
+        <StatsCard title="Public Events" value={stats.publicEvents} icon={Globe} bgColor="bg-purple-500" />
+        <StatsCard title="Active Events" value={stats.activeEvents} icon={Clock} bgColor="bg-orange-500" />
       </div>
 
       {/* Search and Filter */}
@@ -334,71 +154,119 @@ const Events = () => {
           <Input
             placeholder="Search events..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={handleSearchChange}
             className="pl-10 bg-white/50 border-gray-200/50"
           />
         </div>
-        <div className="flex gap-2">
-          <Button
-            variant={filterType === "all" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setFilterType("all")}
-          >
-            All
-          </Button>
-          <Button
-            variant={filterType === "public" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setFilterType("public")}
-          >
-            Public
-          </Button>
-          <Button
-            variant={filterType === "private" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setFilterType("private")}
-          >
-            Private
-          </Button>
-          <Button
-            variant={filterType === "active" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setFilterType("active")}
-          >
-            Active
-          </Button>
-        </div>
+        <FilterButtons activeFilter={filterType} onFilterChange={handleFilterChange} />
       </div>
 
       {/* Events Grid */}
-      {filteredEvents.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-          {filteredEvents.map((event) => (
-            <EventCard key={event.id} event={event} />
-          ))}
-        </div>
-      ) : (
-        <Card className="bg-white border shadow-sm">
-          <CardContent className="p-8 text-center">
-            <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No events found</h3>
-            <p className="text-gray-600 mb-4">
-              {searchQuery || filterType !== "all"
-                ? "Try adjusting your search or filter criteria"
-                : "Get started by creating your first event"}
-            </p>
-            {!searchQuery && filterType === "all" && (
-              <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white">
-                <Plus className="w-4 h-4 mr-2" />
-                Create Your First Event
-              </Button>
-            )}
-          </CardContent>
-        </Card>
-      )}
+      <EventsGrid
+        events={filteredEvents}
+        username={processedData.username}
+        searchQuery={searchQuery}
+        filterType={filterType}
+        onRefresh={() => fetchUserEvents(true)}
+      />
     </div>
-    // {/* </DashboardLayout> */}
   )
 }
 
-export default EventsPage;
+// Memoized Stats Card Component
+const StatsCard = React.memo<{
+  title: string
+  value: number
+  icon: React.ComponentType<{ className?: string }>
+  bgColor: string
+}>(({ title, value, icon: Icon, bgColor }) => (
+  <Card className="bg-white border shadow-sm">
+    <CardContent className="p-4 md:p-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm font-medium text-gray-600">{title}</p>
+          <p className="text-2xl md:text-3xl font-bold text-gray-900">{value}</p>
+        </div>
+        <div className={`w-10 h-10 md:w-12 md:h-12 ${bgColor} rounded-xl flex items-center justify-center`}>
+          <Icon className="w-5 h-5 md:w-6 md:h-6 text-white" />
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+))
+
+StatsCard.displayName = "StatsCard";
+
+// Memoized Filter Buttons Component
+const FilterButtons = React.memo<{
+  activeFilter: FilterType
+  onFilterChange: (filter: FilterType) => void
+}>(({ activeFilter, onFilterChange }) => {
+  const filters: { key: FilterType; label: string }[] = [
+    { key: "all", label: "All" },
+    { key: "public", label: "Public" },
+    { key: "private", label: "Private" },
+    { key: "active", label: "Active" },
+  ]
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      {filters.map(({ key, label }) => (
+        <Button
+          key={key}
+          className="cursor-pointer"
+          variant={activeFilter === key ? "default" : "outline"}
+          size="sm"
+          onClick={() => onFilterChange(key)}
+        >
+          {label}
+        </Button>
+      ))}
+    </div>
+  )
+})
+
+FilterButtons.displayName = "FilterButtons";
+
+// Memoized Events Grid Component
+const EventsGrid = React.memo<{
+  events: Event[]
+  username: string
+  searchQuery: string
+  filterType: FilterType
+  onRefresh: () => void
+}>(({ events, username, searchQuery, filterType, onRefresh }) => {
+  if (events.length > 0) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+        {events.map((event) => (
+          <EventCard key={event.id} event={event} username={username} is_public={false} onEventDeleted={onRefresh} />
+        ))}
+      </div>
+    )
+  }
+
+  return (
+    <Card className="bg-white border shadow-sm">
+      <CardContent className="p-8 text-center">
+        <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">No events found</h3>
+        <p className="text-gray-600 mb-4">
+          {searchQuery || filterType !== "all"
+            ? "Try adjusting your search or filter criteria"
+            : "Get started by creating your first event"}
+        </p>
+        {!searchQuery && filterType === "all" && (
+          <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white">
+            <Plus className="w-4 h-4 mr-2" />
+            Create Your First Event
+          </Button>
+        )}
+      </CardContent>
+    </Card>
+  )
+})
+
+EventsGrid.displayName = "EventsGrid";
+
+export default Events
