@@ -207,28 +207,28 @@ const DashboardPage = () => {
         },
     })
 
-    const currentUsername = watch("username")
-    const { loading, error, fn: fnUpdateUsername } = useFetch(updateUsername)
+    const currentUsername = watch("username");
+    const { loading, error, fn: fnUpdateUsername } = useFetch(updateUsername);
 
     // Set initial values when user loads
     useEffect(() => {
         if (isLoaded && user) {
-            setLocationOrigin(window.location.origin)
-            setValue("username", user.username || "")
+            setLocationOrigin(window.location.origin);
+            setValue("username", user.username || "");
         }
     }, [isLoaded, user, setValue])
 
     const onSubmit = async (data: { username: string }) => {
         try {
-            const response = await fnUpdateUsername(data.username)
+            const response = await fnUpdateUsername(data.username);
             if (response.success) {
-                toast.success("Username updated successfully!")
-                setIsEditing(false)
+                toast.success("Username updated successfully!");
+                setIsEditing(false);
             } else {
-                toast.error(response.error?.message || "Failed to update username")
+                toast.error(response.error?.message || "Failed to update username");
             }
         } catch (err) {
-            toast.error("An unexpected error occurred")
+            toast.error("An unexpected error occurred");
         }
     }
 

@@ -76,7 +76,7 @@ export const deleteEvent = async (eventId: string) => {
         where: { id: eventId }
     });
 
-    return success('Event deleted successfully');
+    return success('Event deleted successfully', null);
 }
 
 export const getEventDetails = async (username: string, eventId: string) => {

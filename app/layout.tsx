@@ -9,6 +9,7 @@ import {
 import CreateEventDrawer from "@/components/ui/create-event";
 import { Suspense } from "react";
 import { Toaster } from "sonner";
+import { EventProvider } from "@/context/EventContext";
 
 export const metadata: Metadata = {
   title: "TimelyMeet",
@@ -32,15 +33,13 @@ const RootLayout = ({
         className={inter.className}
       >
         <ClerkProvider>
-          {/* <Header /> */}
-          {/* <main className="min-h-screen w-full bg-gradient-to-b from-blue-50 to-white"> */}
+          <EventProvider>
             {children}
             <Toaster position="top-right" richColors />
-          {/* </main> */}
-          {/* <Footer /> */}
-          <Suspense fallback={null}>
-            <CreateEventDrawer />
-          </Suspense>
+            <Suspense fallback={null}>
+              <CreateEventDrawer />
+            </Suspense>
+          </EventProvider>
         </ClerkProvider>
       </body>
     </html>

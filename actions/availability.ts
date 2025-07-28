@@ -144,5 +144,5 @@ export const updateUserAvailability = async (data: UpdateAvailabilityData) => {
         });
     }
 
-    return success("Availability updated successfully");
+    return success("Availability updated successfully", null);
 }

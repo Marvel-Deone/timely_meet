@@ -91,11 +91,11 @@ const EventForm: React.FC<EventFormProps> = ({ onSumbitForm, onEventCreated }) =
                 <Input id='title' {...register("title")} className='mt-1' />
                 {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
             </div>
-            {/* <div>
+            <div>
                 <label htmlFor="description" className='block text-sm font-medium text-gray-700'>Event description</label>
                 <Input id='description' {...register("description")} className='mt-1' />
                 {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
-            </div> */}
+            </div>
             <div>
                 <label htmlFor="description" className='block text-sm font-medium text-gray-700'>Duration (minutes)</label>
                 <Input id='duration' {...register("duration", {

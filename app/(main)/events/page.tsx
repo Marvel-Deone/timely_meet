@@ -13,6 +13,7 @@ import type { Event } from "@/lib/types/event.types";
 import Image from "next/image";
 import useFetch from "@/hooks/use-fetch";
 import EventCard from "@/components/dashboard/event-card";
+import { useEventContext } from "@/context/EventContext";
 
 type FilterType = "all" | "public" | "private" | "active";
 
@@ -29,14 +30,14 @@ interface EventStats {
 }
 
 const Events = () => {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [filterType, setFilterType] = useState<FilterType>("all")
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterType, setFilterType] = useState<FilterType>("all");
 
-  const { data: userEvents, loading, error, fn: fetchUserEvents } = useFetch<EventsResponse>(getUserEvents)
-
+  // const { data: userEvents, loading, error, fn: fetchUserEvents } = useFetch<EventsResponse>(getUserEvents)
+const { eventData: userEvents, loading, refetchEvents, error} = useEventContext();
   useEffect(() => {
-    fetchUserEvents();
-  }, [fetchUserEvents]);
+    refetchEvents();
+  }, [refetchEvents]);
 
   // Memoize processed events data
   const processedData = useMemo(() => {
@@ -127,7 +128,7 @@ const Events = () => {
     )
   }
 
-  const { stats } = processedData
+  const { stats } = processedData;
 
   return (
     <div className="space-y-6">
@@ -167,7 +168,7 @@ const Events = () => {
         username={processedData.username}
         searchQuery={searchQuery}
         filterType={filterType}
-        onRefresh={() => fetchUserEvents(true)}
+        onRefresh={() => refetchEvents(true)}
       />
     </div>
   )
@@ -228,7 +229,6 @@ const FilterButtons = React.memo<{
 
 FilterButtons.displayName = "FilterButtons";
 
-// Memoized Events Grid Component
 const EventsGrid = React.memo<{
   events: Event[]
   username: string
@@ -269,4 +269,4 @@ const EventsGrid = React.memo<{
 
 EventsGrid.displayName = "EventsGrid";
 
-export default Events
+export default Events;

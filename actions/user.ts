@@ -13,7 +13,7 @@ export const updateUsername = async (username: string) => {
 
     if (userWithSameUsername) {
         if (userWithSameUsername.clerk_user_id === userId) {
-            return success("User profile updated successfully");
+            return success("User profile updated successfully", null);
         }
 
         if (userWithSameUsername.clerk_user_id !== userId) {
@@ -28,7 +28,7 @@ export const updateUsername = async (username: string) => {
 
     await (await clerkClient()).users.updateUser(userId, { username });
 
-    return success("User profile updated successfully");
+    return success("User profile updated successfully", null);
 };
 
 export const getUserByUsername = async (username: string) => {

@@ -15,19 +15,17 @@ import Toaster from "../dashboard/Toaster";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select";
 import { AlertColor } from "@mui/material";
 import { toast } from "sonner";
+import { useEventContext } from "@/context/EventContext";
 
 type EventFormProps = {
-    // onSumbitForm?: any;
     onEventCreated?: () => void;
 };
-const CreateEventDrawer: React.FC<EventFormProps> = ({ onEventCreated }) => {
-    const [isOpen, setIsOpen] = useState<boolean>(false);
-    const [open, setOpen] = useState<boolean>(false);
-    const [message, setMessage] = useState<string>('');
-    const [toasterType, setToasterType] = useState<AlertColor>('success');
 
+const CreateEventDrawer = () => {
+    const [isOpen, setIsOpen] = useState<boolean>(false);
     const router = useRouter();
     const searchParams = useSearchParams();
+    const { refetchEvents } = useEventContext();
 
     const { register, handleSubmit, control, formState: { errors }, reset } = useForm({
         resolver: zodResolver(eventSchema),
@@ -37,8 +35,6 @@ const CreateEventDrawer: React.FC<EventFormProps> = ({ onEventCreated }) => {
         }
     });
     const { loading, error, fn: fnCreateEvent } = useFetch(createEvent);
-
-    const handleToasterClose = () => setOpen(false);
 
     useEffect(() => {
         const create = searchParams.get("create");
@@ -50,38 +46,26 @@ const CreateEventDrawer: React.FC<EventFormProps> = ({ onEventCreated }) => {
 
     const handleClose = () => {
         setIsOpen(false);
-        if (searchParams.get("create") == "true") {
-            router.replace(window?.location?.pathname);
-        }
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete('create');
+        router.replace(`/events?${params.toString()}`);
     }
 
     const onSubmit = useCallback(async (data: typeof eventSchema._type) => {
-        // const result = await fnCreateEvent(data);
-        // setOpen(true);
-        // setToasterType(result.success ? 'success' : 'error');
-        // setMessage(
-        //     result.success ? "Event Created Successfully" : result.error.message
-        // );
-        // if (!loading && !error) {
-        //     reset();
-        //     handleClose();
-        //     router.refresh();
-        // }
-
         try {
-            console.log('Try');
-
             const res = await fnCreateEvent(data);
             if (res?.success) {
                 toast.success("Event created successfully");
-                onEventCreated?.();
+                refetchEvents(true);
+                reset();
+                handleClose();
             } else {
                 toast.error(res?.error?.message || "Failed to create event.")
             }
         } catch (err) {
             toast.error("An unexpected error occurred");
         }
-    }, [fnCreateEvent, onEventCreated]);
+    }, [fnCreateEvent, refetchEvents]);
 
     return (
         <>
@@ -150,14 +134,6 @@ const CreateEventDrawer: React.FC<EventFormProps> = ({ onEventCreated }) => {
                     </DialogContent>
                 </div>
             </Dialog>
-
-            {/* Snackbar */}
-            <Toaster
-                open={open}
-                message={message}
-                type={toasterType}
-                onClose={handleToasterClose}
-            />
         </>
     )
 }

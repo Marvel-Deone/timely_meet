@@ -42,14 +42,12 @@ const EventCard = React.memo<EventCardProps>(({ event, username, is_public, onEv
 
   const { loading: deleteLoading, fn: fnDeleteEvent } = useFetch(deleteEvent)
 
-  // Memoize computed values
   const eventUrl = useMemo(() => `${username}/${event.id}`, [username, event.id])
   const publicEventUrl = useMemo(() => `${window.location.origin}/event/${event.id}`, [event.id])
   const colorClasses = useMemo(() => getColorClasses(generateEventColor(event)), [event])
   const bookingCount = useMemo(() => event._count?.bookings || 0, [event._count?.bookings])
   const isActive = useMemo(() => bookingCount > 0, [bookingCount])
 
-  // Memoized event handlers
   const handleCardClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       const target = e.target as HTMLElement
