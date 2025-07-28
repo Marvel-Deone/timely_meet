@@ -1,28 +1,27 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "./button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "./dialog";
-import { Label } from "./label";
 import { Input } from "./input";
 import useFetch from "@/hooks/use-fetch";
-import { createEvent } from "@/actions/event";
-import { eventSchema } from "@/app/lib/validators";
+import { createEvent, getOwnedEventDetails, updateUserEvent } from "@/actions/event";
+import { eventSchema } from "@/lib/validators";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import Toaster from "../dashboard/Toaster";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select";
-import { AlertColor } from "@mui/material";
+import { toast } from "sonner";
+import { useEventContext } from "@/context/EventContext";
 
 const CreateEventDrawer = () => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
-    const [open, setOpen] = useState<boolean>(false);
-    const [message, setMessage] = useState<string>('');
-    const [toasterType, setToasterType] = useState<AlertColor>('success');
-
     const router = useRouter();
     const searchParams = useSearchParams();
+    const { refetchEvents } = useEventContext();
+    const isEditMode = searchParams.get('edit') === 'true';
+
+    const eventId = searchParams.get('id');
 
     const { register, handleSubmit, control, formState: { errors }, reset } = useForm({
         resolver: zodResolver(eventSchema),
@@ -31,38 +30,66 @@ const CreateEventDrawer = () => {
             is_private: true
         }
     });
-    const { loading, error, fn: fnCreateEvent } = useFetch(createEvent);
-
-    const handleToasterClose = () => setOpen(false);
+    const { loading, error, fn } = useFetch(async (data) => {
+        if (isEditMode && eventId) {
+            return await updateUserEvent(eventId, data);
+        }
+        return await createEvent(data);
+    });
+    // const { loading, error, fn: fnEditEvent } = useFetch(editEvent);
 
     useEffect(() => {
         const create = searchParams.get("create");
+        const edit = searchParams.get("edit");
 
-        if (create == "true") {
+        if (create == "true" || edit === "true") {
             setIsOpen(true);
         }
-    }, [searchParams])
+
+        if (edit === "true" && eventId) {
+            (async () => {
+                try {
+                    const res = await getOwnedEventDetails(eventId);
+                    if (res && "data" in res) {
+                        reset({
+                            title: res.data.title,
+                            description: res.data.description ?? "",
+                            duration: res.data.duration,
+                            is_private: res.data.is_private,
+                        });
+                    }
+                } catch (err) {
+                    console.error("Failed to fetch event", err);
+                }
+            })();
+        }
+    }, [searchParams, eventId, reset]);
 
     const handleClose = () => {
         setIsOpen(false);
-        if (searchParams.get("create") == "true") {
-            router.replace(window?.location?.pathname);
-        }
+        const params = new URLSearchParams(window.location.search);
+
+        ['create', 'edit', 'id'].forEach(key => params.delete(key));
+
+        const newQuery = params.toString();
+        router.replace(`/events${newQuery ? `?${newQuery}` : ''}`);
     }
 
-    const onSubmit = async (data: typeof eventSchema._type) => {
-        const result = await fnCreateEvent(data);
-        setOpen(true);
-        setToasterType(result.success ? 'success' : 'error');
-        setMessage(
-            result.success ? "Event Created Successfully" : result.error.message
-        );
-        if (!loading && !error) {
-            reset();
-            handleClose();
-            router.refresh();
+    const onSubmit = useCallback(async (data: typeof eventSchema._type) => {
+        try {
+            const res = await fn(data);
+            if (res?.success) {
+                toast.success(isEditMode ? "Event updated successfully" : "Event created successfully");
+                refetchEvents(true);
+                reset();
+                handleClose();
+            } else {
+                toast.error(res?.error?.message || (isEditMode ? "Failed to update event." : "Failed to create event."));
+            }
+        } catch (err) {
+            toast.error("An unexpected error occurred");
         }
-    }
+    }, [fn, refetchEvents, isEditMode, reset, handleClose]);
 
     return (
         <>
@@ -73,9 +100,9 @@ const CreateEventDrawer = () => {
                 <div className='flex flex-col gap-4'>
                     <DialogContent className="sm:max-w-[425px]">
                         <DialogHeader>
-                            <DialogTitle>Create New Event</DialogTitle>
+                            <DialogTitle>{isEditMode ? 'Update Event' : 'Create New Event'}</DialogTitle>
                             <DialogDescription>
-                                Fill out the details below to create a new event. Click save when you&apos;re done.
+                                {isEditMode ? `Update the event details below. Click save when you&apos;re done.` : `Fill out the details below to create a new event. Click save when you&apos;re done.`}
                             </DialogDescription>
                         </DialogHeader>
                         <form className='flex flex-col gap-4' onSubmit={handleSubmit(onSubmit)}>
@@ -125,20 +152,12 @@ const CreateEventDrawer = () => {
                                 <DialogClose asChild>
                                     <Button onClick={handleClose} variant="outline" className="cursor-pointer">Cancel</Button>
                                 </DialogClose>
-                                <Button type="submit" disabled={loading} className='bg-blue-600 cursor-pointer hover:bg-blue-600'>{loading ? "Submitting..." : "Create Event"}</Button>
+                                <Button type="submit" disabled={loading} className='bg-blue-600 cursor-pointer hover:bg-blue-600'> {loading ? "Submitting..." : isEditMode ? "Update Event" : "Create Event"}</Button>
                             </DialogFooter>
                         </form>
                     </DialogContent>
                 </div>
             </Dialog>
-
-            {/* Snackbar */}
-            <Toaster
-                open={open}
-                message={message}
-                type={toasterType}
-                onClose={handleToasterClose}
-            />
         </>
     )
 }
