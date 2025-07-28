@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { Calendar, Clock, Users, Plus, Search, Globe } from "lucide-react";
@@ -14,6 +14,7 @@ import Image from "next/image";
 import useFetch from "@/hooks/use-fetch";
 import EventCard from "@/components/dashboard/event-card";
 import { useEventContext } from "@/context/EventContext";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type FilterType = "all" | "public" | "private" | "active";
 
@@ -33,13 +34,11 @@ const Events = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<FilterType>("all");
 
-  // const { data: userEvents, loading, error, fn: fetchUserEvents } = useFetch<EventsResponse>(getUserEvents)
-const { eventData: userEvents, loading, refetchEvents, error} = useEventContext();
+  const { eventData: userEvents, loading, refetchEvents, error } = useEventContext();
   useEffect(() => {
     refetchEvents();
   }, [refetchEvents]);
 
-  // Memoize processed events data
   const processedData = useMemo(() => {
     if (!userEvents?.events) {
       return { events: [], username: "", stats: { total: 0, totalBookings: 0, publicEvents: 0, activeEvents: 0 } }
@@ -64,7 +63,6 @@ const { eventData: userEvents, loading, refetchEvents, error} = useEventContext(
     }
   }, [userEvents])
 
-  // Memoize filtered events
   const filteredEvents = useMemo(() => {
     return processedData.events.filter((event) => {
       const description = (event.description ?? "").toLowerCase();
@@ -84,22 +82,16 @@ const { eventData: userEvents, loading, refetchEvents, error} = useEventContext(
     })
   }, [processedData.events, searchQuery, filterType]);
 
-  // Memoize search handler
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value)
   }, [])
 
-  // Memoize filter handlers
   const handleFilterChange = useCallback((filter: FilterType) => {
     setFilterType(filter)
   }, [])
 
   if (loading) {
-    return (
-      <div className="w-full py-10 flex justify-center items-center h-[70vh]">
-        <RiseLoader color="#6366f1" />
-      </div>
-    )
+    return <EventsLoading />
   }
 
   if (error) {
@@ -174,7 +166,6 @@ const { eventData: userEvents, loading, refetchEvents, error} = useEventContext(
   )
 }
 
-// Memoized Stats Card Component
 const StatsCard = React.memo<{
   title: string
   value: number
@@ -198,7 +189,6 @@ const StatsCard = React.memo<{
 
 StatsCard.displayName = "StatsCard";
 
-// Memoized Filter Buttons Component
 const FilterButtons = React.memo<{
   activeFilter: FilterType
   onFilterChange: (filter: FilterType) => void
@@ -228,6 +218,24 @@ const FilterButtons = React.memo<{
 })
 
 FilterButtons.displayName = "FilterButtons";
+
+
+// Loading skeleton for event list
+const EventsLoading = () => (
+  <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
+    {[1, 2, 3].map((i) => (
+      <Card key={i} className="bg-white border shadow-sm">
+        <CardContent className="p-6">
+          <Skeleton className="h-6 w-3/4 mb-2" />
+          <Skeleton className="h-4 w-1/2 mb-4" />
+          <Skeleton className="h-4 w-full mb-2" />
+          <Skeleton className="h-4 w-2/3 mb-4" />
+          <Skeleton className="h-10 w-full" />
+        </CardContent>
+      </Card>
+    ))}
+  </div>
+)
 
 const EventsGrid = React.memo<{
   events: Event[]
@@ -265,7 +273,7 @@ const EventsGrid = React.memo<{
       </CardContent>
     </Card>
   )
-})
+});
 
 EventsGrid.displayName = "EventsGrid";
 

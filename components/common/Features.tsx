@@ -1,6 +1,6 @@
-import { features } from '@/lib/consts/data';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
+import { features } from '@/lib/const/data';
 
 const Features = () => {
     return (

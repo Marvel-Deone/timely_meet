@@ -27,7 +27,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
-import { generateEventColor, getColorClasses } from "@/utils/common";
+import { generateEventColor, getColorClasses } from "@/lib/common";
 
 interface EventCardProps {
     event: Event
@@ -37,13 +37,13 @@ interface EventCardProps {
 }
 
 const EventCard = React.memo<EventCardProps>(({ event, username, is_public, onEventDeleted }) => {
-    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-    const router = useRouter()
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const router = useRouter();
 
     const { loading: deleteLoading, fn: fnDeleteEvent } = useFetch(deleteUserEvent)
 
     const eventUrl = useMemo(() => `${username}/${event.id}`, [username, event.id])
-    const publicEventUrl = useMemo(() => `${window.location.origin}/event/${event.id}`, [event.id])
+    const publicEventUrl = useMemo(() => `${window.location.origin}/${username}/${event.id}`, [event.id])
     const colorClasses = useMemo(() => getColorClasses(generateEventColor(event)), [event])
     const bookingCount = useMemo(() => event._count?.bookings || 0, [event._count?.bookings])
     const isActive = useMemo(() => bookingCount > 0, [bookingCount])
@@ -77,7 +77,6 @@ const EventCard = React.memo<EventCardProps>(({ event, username, is_public, onEv
     }, [eventUrl])
 
     const handleEditEvent = useCallback(() => {
-        // router.push(`/events/${event.id}/edit`);
         router.push(`/events?edit=true&id=${event.id}`);
     }, [router, event.id]);
 

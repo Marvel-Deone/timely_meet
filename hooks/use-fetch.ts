@@ -1,4 +1,4 @@
-import { ErrorResponse, SuccessResponse } from "@/utils/response";
+import { ErrorResponse, SuccessResponse } from "@/lib/response";
 import { useCallback, useState } from "react";
 
 const useFetch = <T = unknown>(
@@ -14,11 +14,9 @@ const useFetch = <T = unknown>(
 
             if (!silent) setLoading(true);
             setError(null);
-            
+
             try {
                 const response = await cb(...args);
-                console.log('Response from useFetch:', response);
-
                 if (response.success) {
                     setData((response as SuccessResponse<T>).data ?? null);
                 } else {

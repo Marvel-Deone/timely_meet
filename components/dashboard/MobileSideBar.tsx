@@ -1,6 +1,7 @@
 "use client"
 
 import { Calendar, Clock, BarChart3, Video, X } from "lucide-react"
+import { usePathname } from "next/navigation"
 
 interface MobileSidebarProps {
   isOpen: boolean
@@ -15,7 +16,8 @@ const sidebarItems = [
 ]
 
 const MobileSidebar = ({ isOpen, onClose }: MobileSidebarProps) => {
-  if (!isOpen) return null
+   const pathname = usePathname();
+  if (!isOpen) return null;
 
   return (
     <>
@@ -48,7 +50,7 @@ const MobileSidebar = ({ isOpen, onClose }: MobileSidebarProps) => {
                 href={item.href}
                 onClick={onClose}
                 className={`group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
-                  item.isActive
+                  item.href === pathname
                     ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg"
                     : "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
                 }`}

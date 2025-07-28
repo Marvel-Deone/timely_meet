@@ -5,9 +5,9 @@ import { Card, CardContent } from "../ui/card";
 import { Carousel, CarouselContent, CarouselItem } from "../ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import { testimonials } from "@/lib/consts/data";
 import { Badge } from "../ui/badge";
 import { Star } from "lucide-react";
+import { testimonials } from "@/lib/const/data";
 
 const Testimonials = () => {
     const plugin = useRef(

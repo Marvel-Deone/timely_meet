@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useState } from 'react';
 import useFetch from '@/hooks/use-fetch';
 import { getUserEvents } from '@/actions/event';
-import { SuccessResponse } from '@/utils/response';
+import { SuccessResponse } from '@/lib/response';
 import { Event } from '@/lib/types/event.types';
 // import { isSuccessResponse } from '@/lib/utils';
 

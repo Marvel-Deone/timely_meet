@@ -14,40 +14,6 @@ export const formatMeetingTime = (startTime: Date): string => {
     }
 }
 
-
-// / Utility function to generate consistent colors for events
-// export const generateEventColor = (event: Event): string => {
-//   const colors = ["blue", "green", "purple", "orange", "pink", "indigo", "teal", "red"]
-
-//   // Create a simple hash from the event ID to ensure consistency
-//   let hash = 0
-//   for (let i = 0; i < eventId.length; i++) {
-//     const char = eventId.charCodeAt(i)
-//     hash = (hash << 5) - hash + char
-//     hash = hash & hash // Convert to 32-bit integer
-//   }
-
-//   // Use absolute value and modulo to get a consistent index
-//   const colorIndex = Math.abs(hash) % colors.length
-//   return colors[colorIndex]
-// }
-
-// const generateEventColor = (event: Event): { event: Event } => {
-//     const colors = ["blue", "green", "purple", "orange", "pink", "indigo", "teal", "red"]
-
-//     // Create a simple hash from the event ID to ensure consistency
-//     let hash = 0
-//     for (let i = 0; i < event.id.length; i++) {
-//         const char = event.id.charCodeAt(i)
-//         hash = (hash << 5) - hash + char
-//         hash = hash & hash // Convert to 32-bit integer
-//     }
-
-//     // Use absolute value and modulo to get a consistent index
-//     const colorIndex = Math.abs(hash) % colors.length
-//     return colors[colorIndex]
-// }
-
 export const generateEventColor = (event: Event): string => {
   const colors = ["blue", "green", "purple", "orange", "pink", "indigo", "teal", "red"]
 
@@ -56,10 +22,9 @@ export const generateEventColor = (event: Event): string => {
   for (let i = 0; i < event.id.length; i++) {
     const char = event.id.charCodeAt(i)
     hash = (hash << 5) - hash + char
-    hash = hash & hash // Convert to 32-bit integer
+    hash = hash & hash
   }
 
-  // Use absolute value and modulo to get a consistent index
   const colorIndex = Math.abs(hash) % colors.length
   return colors[colorIndex]
 }

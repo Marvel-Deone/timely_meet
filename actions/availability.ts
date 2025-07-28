@@ -2,7 +2,7 @@
 
 import { DayOfWeek } from "@/lib/generated/prisma";
 import { db } from "@/lib/prisma";
-import { error, success } from "@/utils/response";
+import { error, success } from "@/lib/response";
 import { auth } from "@clerk/nextjs/server";
 
 const dayKeyToEnum = {
@@ -92,20 +92,9 @@ export const updateUserAvailability = async (data: UpdateAvailabilityData) => {
     }
 
     const availability_data = Object.entries(data).filter(([key]) => key !== "time_gap").flatMap(([daySchema, { is_available, start_time, end_time }]) => {
-        console.log('Hiisss');
-        
         if (is_available) {
-            console.log('Yesssss');
             base_date = new Date().toISOString().split('T')[0];
-            console.log('okkkkkkk');
             const day = dayKeyToEnum[daySchema as keyof typeof dayKeyToEnum];
-            console.log('Checking');
-            if (!day) {
-                console.log('MyDaySchema:', daySchema);
-                console.log(`Invalid day key: ${daySchema}`);
-            }
-            console.log('Hisjj', day);
-            
             return [{
                 day,
                 // start_time: new Date(`${base_date}T${start_time}:00Z`),
@@ -116,11 +105,7 @@ export const updateUserAvailability = async (data: UpdateAvailabilityData) => {
         return [];
     });
 
-    console.log('availability_data:', availability_data);
-
-
     if (user.availability.length > 0) {
-        console.log('Updating existing availability');
         await db.availability.update({
             where: { id: user.availability[0].id },
             data: {
@@ -132,7 +117,6 @@ export const updateUserAvailability = async (data: UpdateAvailabilityData) => {
             }
         });
     } else {
-        console.log('Creating new availability');
         await db.availability.create({
             data: {
                 user_id: user.id,

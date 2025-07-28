@@ -1,8 +1,8 @@
 'use server';
 
-import { eventSchema } from "@/app/lib/validators";
+import { eventSchema } from "@/lib/validators";
 import { db } from "@/lib/prisma";
-import { error, success } from "@/utils/response";
+import { error, success } from "@/lib/response";
 import { auth } from "@clerk/nextjs/server";
 import { addDays, addMinutes, format, isBefore, parseISO, startOfDay } from "date-fns";
 

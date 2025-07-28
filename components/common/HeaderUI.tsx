@@ -74,14 +74,13 @@ const HeaderUI = () => {
 
           {/* Mobile Menu Button + User Area */}
           <div className="lg:hidden flex items-center space-x-3">
-            <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)} className="cursor-pointer">
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
 
-            {/* Mobile User Area - Always shows something */}
             <SignedOut>
               <SignInButton forceRedirectUrl="/dashboard">
-                <Button
+                <Button onClick={() => setIsMenuOpen(false)}
                   variant="ghost"
                   size="sm"
                   className="cursor-pointer hover:scale-105 transition-transform duration-200"

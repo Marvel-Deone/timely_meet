@@ -1,8 +1,8 @@
 "use client";
 
-import { howItWorks, workflowSteps } from '@/lib/consts/data';
 import { useState } from 'react';
 import { Badge } from '../ui/badge';
+import { workflowSteps } from '@/lib/const/data';
 
 
 const HowItWorks = () => {

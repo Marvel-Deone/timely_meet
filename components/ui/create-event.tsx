@@ -7,7 +7,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { Input } from "./input";
 import useFetch from "@/hooks/use-fetch";
 import { createEvent, getOwnedEventDetails, updateUserEvent } from "@/actions/event";
-import { eventSchema } from "@/app/lib/validators";
+import { eventSchema } from "@/lib/validators";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select";

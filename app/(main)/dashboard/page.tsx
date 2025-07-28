@@ -25,12 +25,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useUser } from "@clerk/nextjs";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { usernameSchema } from "@/app/lib/validators";
+import { usernameSchema } from "@/lib/validators";
 import useFetch from "@/hooks/use-fetch";
 import { updateUsername } from "@/actions/user";
 import { toast } from "sonner";
 import { getUserMeetings } from "@/actions/meetings";
-import { formatMeetingTime } from "@/utils/common";
+import { formatMeetingTime } from "@/lib/common";
 
 const recentEvents = [
     { name: "Team Standup", time: "9:00 AM", attendees: 5, status: "completed" },
@@ -106,13 +106,6 @@ const UpcomingMeetings = () => {
 
     const upcoming_meetings = meetings || [];
 
-    // const upcomingMeetings = transformMeetings(meetings)
-
-    console.log('upcoming_meetings', upcoming_meetings);
-
-
-    // const res = await getUserMeetings();
-    // const meetings = res && "data" in res ? res.data : [];
     return (
         <Card className="bg-white border shadow-sm">
             <CardHeader className="p-4 md:p-6">
@@ -190,9 +183,9 @@ const RecentActivity = () => {
 }
 
 const DashboardPage = () => {
-    const [locationOrigin, setLocationOrigin] = useState<string>("")
-    const [isEditing, setIsEditing] = useState(false)
-    const { isLoaded, user } = useUser()
+    const [locationOrigin, setLocationOrigin] = useState<string>("");
+    const [isEditing, setIsEditing] = useState(false);
+    const { isLoaded, user } = useUser();
 
     const {
         register,
@@ -210,13 +203,12 @@ const DashboardPage = () => {
     const currentUsername = watch("username");
     const { loading, error, fn: fnUpdateUsername } = useFetch(updateUsername);
 
-    // Set initial values when user loads
     useEffect(() => {
-        if (isLoaded && user) {
+        if (typeof window !== "undefined" && isLoaded && user) {
             setLocationOrigin(window.location.origin);
             setValue("username", user.username || "");
         }
-    }, [isLoaded, user, setValue])
+    }, [isLoaded, user, setValue]);
 
     const onSubmit = async (data: { username: string }) => {
         try {
@@ -233,7 +225,6 @@ const DashboardPage = () => {
     }
 
     const copyLink = () => {
-        console.log('Hinn');
         const linkToCopy = `${locationOrigin}/${currentUsername || user?.username || ""}`
         navigator.clipboard.writeText(linkToCopy)
         toast.success("Link copied to clipboard!")
@@ -244,7 +235,6 @@ const DashboardPage = () => {
         setIsEditing(false)
     }
 
-    // Memoize the current date to prevent unnecessary re-renders
     const currentDate = useMemo(() => {
         return new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })
     }, [])

@@ -1,7 +1,7 @@
 'use server'
 
 import { db } from "@/lib/prisma";
-import { error, success } from "@/utils/response";
+import { error, success } from "@/lib/response";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 
 export const updateUsername = async (username: string) => {
