@@ -34,9 +34,6 @@ export const checkUser = async () => {
                 username: name.split(" ").join("_") + user.id.slice(-4)
             }
         });
-
-        // const getUserByUsername = await updateUsername(newUser.username);
-        // console.log('Get user by username:', getUserByUsername);
         return newUser;
     } catch (err) {
         console.error('err:', err);
