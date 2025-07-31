@@ -32,25 +32,33 @@ export const createEvent = async (data: typeof eventSchema._input) => {
 
 export const getUserEvents = async () => {
     const { userId } = await auth();
+    try {
+        if (!userId) {
+            return error("Unauthorized", 401, "Unauthorized");
+        }
+        console.log('userId', userId);
 
-    if (!userId) {
-        return error("Unauthorized", 401, "Unauthorized");
-    }
-
-    const user = await db.user.findUnique({ where: { clerk_user_id: userId } });
-    if (!user) return error("User not found", 404, "Not Found");
-
-    const events = await db.event.findMany({
-        where: { user_id: user.id },
-        orderBy: { created_at: "desc" },
-        include: {
-            _count: {
-                select: { bookings: true }
+        const user = await db.user.findUnique({ where: { clerk_user_id: userId } });
+        if (!user) return error("User not found", 404, "Not Found");
+        console.log('My user:');
+        const events = await db.event.findMany({
+            where: { user_id: user.id },
+            orderBy: { created_at: "desc" },
+            include: {
+                _count: {
+                    select: { bookings: true }
+                },
             },
-        },
-    });
-    const data = { events, username: user.username }
-    return success('User events fetched successfully', data);
+        });
+        console.log("Fetching Event");
+        const data = { events, username: user.username };
+        console.log('Fetched');
+        console.log('Done');
+        return success('User events fetched successfully', data);
+    } catch (err: any) {
+        console.log('mydsdsg:', err);
+        return error(err instanceof Error ? err.message : String(err), err instanceof Error && err.message ? 400 : 500, err instanceof Error && err.message ? "Bad Request" : "Internal Server Error");
+    }
 }
 
 export const deleteUserEvent = async (eventId: string) => {
