@@ -31,6 +31,7 @@ import { updateUsername } from "@/actions/user";
 import { toast } from "sonner";
 import { getUserMeetings } from "@/actions/meetings";
 import { formatMeetingTime } from "@/lib/common";
+import Image from "next/image";
 
 const recentEvents = [
     { name: "Team Standup", time: "9:00 AM", attendees: 5, status: "completed" },
@@ -105,6 +106,28 @@ const UpcomingMeetings = () => {
     if (error) return <p className="p-4 text-red-500">Error loading meetings</p>;
 
     const upcoming_meetings = meetings || [];
+
+    if (meetings && meetings.length === 0) {
+        return (
+            <Card className="bg-white border shadow-sm">
+                <CardContent className="p-8 text-center">
+                    <div className="flex flex-col items-center justify-center">
+                        <Image
+                            src="/images/empty_meeting.svg"
+                            alt={`No upcoming meetings found.`}
+                            width={200}
+                            height={200}
+                            className="w-32 h-32 mb-4 opacity-50"
+                        />
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">No upcoming meetings found</h3>
+                        <p className="text-gray-600">
+                            You don't have any upcoming meetings scheduled.
+                        </p>
+                    </div>
+                </CardContent>
+            </Card>
+        )
+    }
 
     return (
         <Card className="bg-white border shadow-sm">
