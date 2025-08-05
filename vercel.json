@@ -5,7 +5,7 @@
     }
   },
   "functions": {
-    "api/**.js": {
+    "api/**": {
       "includeFiles": [
         ".prisma/**",
         "node_modules/.prisma/client/**",
