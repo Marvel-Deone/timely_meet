@@ -1,0 +1,7 @@
+{
+  "build": {
+    "env": {
+      "VERCEL_PRISMA_VERSION": "6"
+    }
+  }
+}
