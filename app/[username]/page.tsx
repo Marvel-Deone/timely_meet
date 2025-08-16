@@ -1,5 +1,6 @@
-import { getUserByUsername } from "@/actions/user";
 import UserProfile from "@/app/[username]/_components/User-profile";
+import { useFetchs } from "@/hooks/use-fetch";
+import { getUserByUsername } from "@/lib/user";
 import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";

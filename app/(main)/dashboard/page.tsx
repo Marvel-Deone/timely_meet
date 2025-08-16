@@ -26,12 +26,14 @@ import { useUser } from "@clerk/nextjs";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { usernameSchema } from "@/lib/validators";
-import useFetch from "@/hooks/use-fetch";
+import useFetch, { useFetchs } from "@/hooks/use-fetch";
 import { updateUsername } from "@/actions/user";
 import { toast } from "sonner";
 import { getUserMeetings } from "@/actions/meetings";
 import { formatMeetingTime } from "@/lib/common";
 import Image from "next/image";
+import { useQuery } from "@tanstack/react-query";
+import { fetchMeetings } from "@/lib/fetcher";
 
 const recentEvents = [
     { name: "Team Standup", time: "9:00 AM", attendees: 5, status: "completed" },
@@ -44,7 +46,6 @@ const upcomingMeetings = [
     { title: "Sprint Planning", time: "Wed, 2:00 PM", participants: ["Team Alpha"] },
 ]
 
-// Loading skeleton for upcoming meetings
 const UpcomingMeetingsSkeleton = () => (
     <Card className="bg-white border shadow-sm">
         <CardHeader className="p-4 md:p-6">
@@ -67,8 +68,6 @@ const UpcomingMeetingsSkeleton = () => (
         </CardContent>
     </Card>
 )
-
-// Loading skeleton for recent activity
 const RecentActivitySkeleton = () => (
     <Card className="bg-white border shadow-sm">
         <CardHeader className="p-4 md:p-6">
@@ -93,16 +92,33 @@ const RecentActivitySkeleton = () => (
         </CardContent>
     </Card>
 )
-
-// Upcoming meetings component
 const UpcomingMeetings = () => {
-    const { data: meetings, loading, error, fn: fetchMeetings } = useFetch(getUserMeetings);
+    // const { data: meetings, loading, error, fn: fetchMeetings } = useFetch(getUserMeetings);
 
-    useEffect(() => {
-        fetchMeetings();
-    }, []);
+    // useEffect(() => {
+    //     fetchMeetings();
+    // }, []);
 
-    if (loading) return <p className="p-4">Loading...</p>;
+
+    // const { data, loading, error, fn } = useFetchs("/api/user", { method: "GET" });
+
+    // useEffect(() => {
+    //     fn({ username: "marvel" }); // converted to query string ?username=marvel
+    // }, [fn]);
+    const { data, error, isLoading } = useQuery({
+        queryKey: ["meetings", "upcoming"], // cache key
+        queryFn: () => fetchMeetings("upcoming"),
+        // queryFn: async () => {
+        //     const res = await fetch(`/api/meetings?type="upcoming"`, { cache: "no-store" });
+        //     if (!res.ok) throw new Error("Failed to fetch meetings");
+        //     console.log('resMeetingRes', res);
+        //     return res.json();
+        // },
+    });
+
+    // const meetings = data?.data || [];
+
+    if (isLoading) return <p className="p-4">Loading...</p>;
     if (error) return <p className="p-4 text-red-500">Error loading meetings</p>;
     if (error) return (
         <Card className="bg-white border shadow-sm">
@@ -122,9 +138,11 @@ const UpcomingMeetings = () => {
         </Card>
     );
 
-    const upcoming_meetings = meetings || [];
+    // const upcoming_meetings = data?.data || [];
 
-    if (meetings && meetings.length === 0) {
+    const upcoming_meetings: any[] = [];
+
+    if (upcoming_meetings && upcoming_meetings.length === 0) {
         return (
             <Card className="bg-white border shadow-sm">
                 <CardContent className="p-8 text-center">
@@ -160,7 +178,7 @@ const UpcomingMeetings = () => {
                 </CardTitle>
             </CardHeader>
             <CardContent className="p-4 md:p-6 pt-0 space-y-3">
-                {upcoming_meetings.map((meeting, index) => (
+                {upcoming_meetings.map((meeting: any, index: number) => (
                     <div key={index} className="p-3 bg-gray-50 rounded-lg border border-gray-100">
                         <div className="font-medium text-sm text-gray-900 mb-1">{meeting.event.title}</div>
                         <div className="text-xs text-gray-600 mb-2">{formatMeetingTime(meeting.start_time)}</div>
@@ -175,8 +193,6 @@ const UpcomingMeetings = () => {
         </Card>
     )
 }
-
-// Recent activity component
 const RecentActivity = () => {
     return (
         <Card className="bg-white border shadow-sm">
@@ -221,7 +237,6 @@ const RecentActivity = () => {
         </Card>
     )
 }
-
 const DashboardPage = () => {
     const [locationOrigin, setLocationOrigin] = useState<string>("");
     const [isEditing, setIsEditing] = useState(false);
@@ -241,8 +256,8 @@ const DashboardPage = () => {
     })
 
     const currentUsername = watch("username");
-    const { loading, error, fn: fnUpdateUsername } = useFetch(updateUsername);
-
+    // const { loading, error, fn: fnUpdateUsername } = useFetch(updateUsername);
+    const { data, loading, error, fn } = useFetchs("/api/user", { method: "POST" });
     useEffect(() => {
         if (typeof window !== "undefined" && isLoaded && user) {
             setLocationOrigin(window.location.origin);
@@ -252,7 +267,8 @@ const DashboardPage = () => {
 
     const onSubmit = async (data: { username: string }) => {
         try {
-            const response = await fnUpdateUsername(data.username);
+            const response = await fn({ username: data.username });
+            console.log('Res:', response);
             if (response.success) {
                 toast.success("Username updated successfully!");
                 setIsEditing(false);

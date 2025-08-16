@@ -1,18 +1,23 @@
 'use client';
 
 import AppLayout from "@/components/layouts/AppLayout";
-// import AppSideBar from "@/components/dashboard/AppSideBar";
-import { Toaster } from "@/components/ui/sonner";
-import { useUser } from "@clerk/nextjs";
 import { useState } from "react";
-import { BarLoader } from "react-spinners"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+// import AppSideBar from "@/components/dashboard/AppSideBar";
 
 interface AppLayoutProps {
     children: React.ReactNode;
 }
 
 const ProtectedLayout = ({ children }: AppLayoutProps) => {
-    return <AppLayout>{children}</AppLayout>;
+    const [queryClient] = useState(() => new QueryClient());
+    return (
+        <QueryClientProvider client={queryClient}>
+            <AppLayout>{children}</AppLayout>
+            <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
+    )
 }
 
 export default ProtectedLayout;
