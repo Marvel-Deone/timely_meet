@@ -3,14 +3,5 @@
     "env": {
       "VERCEL_PRISMA_VERSION": "6"
     }
-  },
-  "functions": {
-    "api/**": {
-      "includeFiles": [
-        ".prisma/**",
-        "node_modules/.prisma/client/**",
-        "node_modules/@prisma/engines/**"
-      ]
-    }
   }
 }
