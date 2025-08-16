@@ -2,7 +2,7 @@ export type ErrorResponse = {
   success: false;
   error: {
     message: string;
-    code?: number;
+    code: number;
     status: string;
   };
 };
@@ -15,7 +15,7 @@ export type SuccessResponse<T = unknown> = {
 
 export const error = (
   message: string,
-  code?: number,
+  code: number,
   status = "Internal Server Error"
 ): ErrorResponse => ({
   success: false,
