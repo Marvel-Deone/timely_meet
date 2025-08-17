@@ -1,6 +1,17 @@
-import { db } from "@/lib/db/prisma";
+import { db } from "../prisma";
 
-export const getUserByUsername = async (username: string) => {
+export async function findUserByUsername(username: string) {
+  return db.user.findUnique({ where: { username } });
+}
+
+export async function updateUserByClerkId(userId: string, data: { username?: string }) {
+  return db.user.update({
+    where: { clerk_user_id: userId },
+    data,
+  });
+}
+
+export async function getUserProfileWithEvents(username: string) {
   return db.user.findUnique({
     where: { username },
     select: {

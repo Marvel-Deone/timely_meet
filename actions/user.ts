@@ -1,6 +1,6 @@
 'use server';
 
-import { db } from "@/lib/prisma";
+import { db } from "@/lib/db/prisma";
 import { error, success } from "@/lib/response";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { bookingSchema } from "@/lib/validators"
+import { bookingSchema } from "@/lib/utils/validators"
 import useFetch from "@/hooks/use-fetch"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { format } from "date-fns"

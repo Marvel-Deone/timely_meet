@@ -25,7 +25,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useUser } from "@clerk/nextjs";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { usernameSchema } from "@/lib/validators";
+import { usernameSchema } from "@/lib/utils/validators";
 import useFetch, { useFetchs } from "@/hooks/use-fetch";
 import { updateUsername } from "@/actions/user";
 import { toast } from "sonner";
