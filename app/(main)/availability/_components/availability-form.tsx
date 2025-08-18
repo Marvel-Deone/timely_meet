@@ -65,7 +65,7 @@ const AvailabilityForm = ({ initialData }: AvailabilityFormProps) => {
                 toast.success(res.message || "Availability updated successfully!");
             } else {
                 toast.error(("error" in res && res.error?.message) || "Failed to update availability");
-            }
+            }   
         } catch (error) {
             toast.error("An unexpected error occurred");
         }

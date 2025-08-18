@@ -37,8 +37,10 @@ const CancelMeeting = ({ bookingId }: CancelMeetingProps) => {
       if (res.success && "data" in res) {
         toast.success(res.message || "Meeting cancelled successfully!");
         router.refresh();
-      } else {
+      } else if ("error" in res) {
         toast.error(res.error?.message || "Failed to cancel booking");
+      } else {
+        toast.error("Failed to cancel booking");
       }
     } catch (error) {
       toast.error("An unexpected error occurred");
