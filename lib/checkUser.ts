@@ -1,5 +1,5 @@
 import { clerkClient, currentUser } from "@clerk/nextjs/server";
-import { db } from "./prisma";
+import { db } from "./db/prisma";
 import { updateUsername } from "@/actions/user";
 
 
