@@ -1,5 +1,4 @@
 import UserProfile from "@/app/[username]/_components/User-profile";
-import { useFetchs } from "@/hooks/use-fetch";
 import { findUserByUsername } from "@/lib/db/repositories/user.repository";
 import { notFound } from "next/navigation";
 

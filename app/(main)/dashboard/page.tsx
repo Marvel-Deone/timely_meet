@@ -29,7 +29,6 @@ import { usernameSchema } from "@/lib/utils/validators";
 import useFetch, { useFetchs } from "@/hooks/use-fetch";
 import { updateUsername } from "@/actions/user";
 import { toast } from "sonner";
-import { getUserMeetings } from "@/actions/meetings";
 import { formatMeetingTime } from "@/lib/common";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
@@ -116,8 +115,8 @@ const UpcomingMeetings = () => {
         // },
     });
 
-    // const meetings = data?.data || [];
-
+    console.log('meetingData:', data);
+    
     if (isLoading) return <p className="p-4">Loading...</p>;
     if (error) return <p className="p-4 text-red-500">Error loading meetings</p>;
     if (error) return (
@@ -138,9 +137,9 @@ const UpcomingMeetings = () => {
         </Card>
     );
 
-    // const upcoming_meetings = data?.data || [];
+    const upcoming_meetings = data?.data || [];
 
-    const upcoming_meetings: any[] = [];
+    // const upcoming_meetings: any[] = [];
 
     if (upcoming_meetings && upcoming_meetings.length === 0) {
         return (

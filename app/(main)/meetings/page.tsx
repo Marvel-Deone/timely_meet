@@ -1,11 +1,10 @@
-import { getUserMeetings } from "@/actions/meetings"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Suspense } from "react"
 import MeetingList from "./_component/meeting-list"
-// import DashboardLayout from "@/components/dashboard-layout"
 import { Card, CardContent } from "@/components/ui/card"
 import { Calendar, Clock, Users, Video } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
+import { getUserMeetings } from "@/lib/services/meeting.service"
 
 export const metadata = {
   title: "Your Meetings | TimelyMeet",
@@ -33,67 +32,68 @@ const StatsLoading = () => (
 
 const Meeting = () => {
   return (
-      <div className="space-y-6">
-        {/* Header Section */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Meetings</h1>
-            <p className="text-gray-600 mt-1">View and manage your upcoming and past meetings</p>
-          </div>
+    <div className="space-y-6">
+      {/* Header Section */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Meetings</h1>
+          <p className="text-gray-600 mt-1">View and manage your upcoming and past meetings</p>
         </div>
-
-        {/* Stats Cards */}
-        <Suspense fallback={<StatsLoading />}>
-          <MeetingStats />
-        </Suspense>
-
-        {/* Tabs */}
-        <Tabs defaultValue="upcoming" className="space-y-6">
-          <TabsList className="grid w-full max-w-md grid-cols-2 bg-gray-100 p-1 rounded-lg">
-            <TabsTrigger
-              className="cursor-pointer data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md transition-all"
-              value="upcoming"
-            >
-              Upcoming
-            </TabsTrigger>
-            <TabsTrigger
-              className="cursor-pointer data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md transition-all"
-              value="past"
-            >
-              Past
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="upcoming" className="space-y-4">
-            <Suspense fallback={<MeetingListLoading />}>
-              <UpcomingMeetings />
-            </Suspense>
-          </TabsContent>
-
-          <TabsContent value="past" className="space-y-4">
-            <Suspense fallback={<MeetingListLoading />}>
-              <PastMeetings />
-            </Suspense>
-          </TabsContent>
-        </Tabs>
       </div>
+
+      {/* Stats Cards */}
+      <Suspense fallback={<StatsLoading />}>
+        <MeetingStats />
+      </Suspense>
+
+      {/* Tabs */}
+      <Tabs defaultValue="upcoming" className="space-y-6">
+        <TabsList className="grid w-full max-w-md grid-cols-2 bg-gray-100 p-1 rounded-lg">
+          <TabsTrigger
+            className="cursor-pointer data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md transition-all"
+            value="upcoming"
+          >
+            Upcoming
+          </TabsTrigger>
+          <TabsTrigger
+            className="cursor-pointer data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md transition-all"
+            value="past"
+          >
+            Past
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="upcoming" className="space-y-4">
+          <Suspense fallback={<MeetingListLoading />}>
+            <UpcomingMeetings />
+          </Suspense>
+        </TabsContent>
+
+        <TabsContent value="past" className="space-y-4">
+          <Suspense fallback={<MeetingListLoading />}>
+            <PastMeetings />
+          </Suspense>
+        </TabsContent>
+      </Tabs>
+    </div>
   )
 }
 
 // Stats component
 const MeetingStats = async () => {
-  // You can fetch actual stats here
-  const upcomingRes = await getUserMeetings("upcoming")
-  const pastRes = await getUserMeetings("past")
+  const [upcomingRes, pastRes] = await Promise.all([
+    getUserMeetings("upcoming"),
+    getUserMeetings("past"),
+  ]);
 
-  const upcomingMeetings = upcomingRes && "data" in upcomingRes ? upcomingRes.data : []
-  const pastMeetings = pastRes && "data" in pastRes ? pastRes.data : []
+  const upcomingMeetings: any[] = (upcomingRes && "data" in upcomingRes && Array.isArray(upcomingRes.data)) ? upcomingRes.data : [];
+  const pastMeetings: any[] = (pastRes && "data" in pastRes && Array.isArray(pastRes.data)) ? pastRes.data : [];
 
-  const totalMeetings = upcomingMeetings.length + pastMeetings.length
+  const totalMeetings = upcomingMeetings.length + pastMeetings.length;
   const todayMeetings = upcomingMeetings.filter((meeting: any) => {
-    const today = new Date()
-    const meetingDate = new Date(meeting.start_time)
-    return meetingDate.toDateString() === today.toDateString()
+    const today = new Date();
+    const meetingDate = new Date(meeting.start_time);
+    return meetingDate.toDateString() === today.toDateString();
   }).length;
 
   return (
@@ -186,4 +186,4 @@ const PastMeetings = async () => {
   return <MeetingList meetings={meetings} type="past" />
 }
 
-export default Meeting
+export default Meeting;
