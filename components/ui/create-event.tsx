@@ -50,7 +50,7 @@ const CreateEventDrawer = () => {
             (async () => {
                 try {
                     const res = await getOwnedEventDetails(eventId);
-                    if (res && "data" in res) {
+                    if (res && "data" in res && res.data) {
                         reset({
                             title: res.data.title,
                             description: res.data.description ?? "",
