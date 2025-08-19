@@ -6,8 +6,8 @@ import { Button } from "../ui/button";
 import { Clock, Users, Link, Trash2, MoreVertical, Eye, Edit, Globe, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { Event } from "@/lib/types/event.types";
-import useFetch from "@/hooks/use-fetch";
-import { deleteUserEvent } from "@/actions/event";
+import useFetch, { useFetchs } from "@/hooks/use-fetch";
+// import { deleteUserEvent } from "@/actions/event";
 import {
     AlertDialog,
     AlertDialogCancel,
@@ -40,8 +40,11 @@ const EventCard = React.memo<EventCardProps>(({ event, username, is_public, onEv
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const router = useRouter();
 
-    const { loading: deleteLoading, fn: fnDeleteEvent } = useFetch(deleteUserEvent)
-
+    // const { loading: deleteLoading, fn: fnDeleteEvent } = useFetchs(deleteUserEvent)
+    const { loading: deleteLoading, fn: fnDeleteEvent } = useFetchs(
+        `/api/events/${event.id}`,
+        { method: "DELETE" }
+    );
     const eventUrl = useMemo(() => `${username}/${event.id}`, [username, event.id])
     const publicEventUrl = useMemo(() => `${window.location.origin}/${username}/${event.id}`, [event.id])
     const colorClasses = useMemo(() => getColorClasses(generateEventColor(event)), [event])
@@ -86,7 +89,7 @@ const EventCard = React.memo<EventCardProps>(({ event, username, is_public, onEv
 
     const handleDeleteConfirm = useCallback(async () => {
         try {
-            const res = await fnDeleteEvent(event.id)
+            const res = await fnDeleteEvent({ id: event.id })
             if (res?.success) {
                 toast.success("Event deleted successfully!");
                 onEventDeleted?.();
@@ -224,7 +227,7 @@ const EventCard = React.memo<EventCardProps>(({ event, username, is_public, onEv
             </AlertDialog>
         </>
     )
-})
+});
 
 EventCard.displayName = "EventCard";
 
