@@ -92,27 +92,9 @@ const RecentActivitySkeleton = () => (
     </Card>
 )
 const UpcomingMeetings = () => {
-    // const { data: meetings, loading, error, fn: fetchMeetings } = useFetch(getUserMeetings);
-
-    // useEffect(() => {
-    //     fetchMeetings();
-    // }, []);
-
-
-    // const { data, loading, error, fn } = useFetchs("/api/user", { method: "GET" });
-
-    // useEffect(() => {
-    //     fn({ username: "marvel" }); // converted to query string ?username=marvel
-    // }, [fn]);
     const { data, error, isLoading } = useQuery({
         queryKey: ["meetings", "upcoming"], // cache key
         queryFn: () => fetchMeetings("upcoming"),
-        // queryFn: async () => {
-        //     const res = await fetch(`/api/meetings?type="upcoming"`, { cache: "no-store" });
-        //     if (!res.ok) throw new Error("Failed to fetch meetings");
-        //     console.log('resMeetingRes', res);
-        //     return res.json();
-        // },
     });
 
     console.log('meetingData:', data);
