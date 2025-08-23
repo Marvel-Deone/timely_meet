@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { generateEventColor, getColorClasses } from "@/lib/common";
+import { useDeleteUserEvent } from "@/lib/api/event.api";
 
 interface EventCardProps {
     event: Event
@@ -41,15 +42,17 @@ const EventCard = React.memo<EventCardProps>(({ event, username, is_public, onEv
     const router = useRouter();
 
     // const { loading: deleteLoading, fn: fnDeleteEvent } = useFetchs(deleteUserEvent)
-    const { loading: deleteLoading, fn: fnDeleteEvent } = useFetchs(
-        `/api/events/${event.id}`,
-        { method: "DELETE" }
-    );
-    const eventUrl = useMemo(() => `${username}/${event.id}`, [username, event.id])
-    const publicEventUrl = useMemo(() => `${window.location.origin}/${username}/${event.id}`, [event.id])
-    const colorClasses = useMemo(() => getColorClasses(generateEventColor(event)), [event])
-    const bookingCount = useMemo(() => event._count?.bookings || 0, [event._count?.bookings])
-    const isActive = useMemo(() => bookingCount > 0, [bookingCount])
+    // const { loading: deleteLoading, fn: fnDeleteEvent } = useFetchs(
+    //     `/api/events/${event.id}`,
+    //     { method: "DELETE" }
+    // );
+    const eventUrl = useMemo(() => `${username}/${event.id}`, [username, event.id]);
+    const publicEventUrl = useMemo(() => `${window.location.origin}/${username}/${event.id}`, [event.id]);
+    const colorClasses = useMemo(() => getColorClasses(generateEventColor(event)), [event]);
+    const bookingCount = useMemo(() => event._count?.bookings || 0, [event._count?.bookings]);
+    const isActive = useMemo(() => bookingCount > 0, [bookingCount]);
+
+    const { mutateAsync: deleteUserEvent, isPending } = useDeleteUserEvent();
 
     const handleCardClick = useCallback(
         (e: React.MouseEvent<HTMLDivElement>) => {
@@ -87,21 +90,19 @@ const EventCard = React.memo<EventCardProps>(({ event, username, is_public, onEv
         setIsDeleteDialogOpen(true);
     }, []);
 
+
     const handleDeleteConfirm = useCallback(async () => {
         try {
-            const res = await fnDeleteEvent({ id: event.id })
-            if (res?.success) {
-                toast.success("Event deleted successfully!");
-                onEventDeleted?.();
-            } else {
-                toast.error(res?.error?.message || "Failed to delete event.")
-            }
-        } catch (err) {
-            toast.error("An unexpected error occurred");
+            await deleteUserEvent(event.id);
+            toast.success("Event deleted successfully");
+            // queryClient.invalidateQueries({ queryKey: ['events'] });
+            onEventDeleted?.();
+        } catch (err: any) {
+            toast.error(err.message || "An unexpected error occurred:");
         } finally {
             setIsDeleteDialogOpen(false);
         }
-    }, [fnDeleteEvent, event.id, onEventDeleted]);
+    }, [deleteUserEvent, event.id, onEventDeleted]);
 
     const avatarComponents = useMemo(() => {
         if (bookingCount === 0) return null
@@ -174,7 +175,7 @@ const EventCard = React.memo<EventCardProps>(({ event, username, is_public, onEv
                                     Edit Event
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem className="text-red-600 cursor-pointer" onClick={handleDeleteClick} disabled={deleteLoading}>
+                                <DropdownMenuItem className="text-red-600 cursor-pointer" onClick={handleDeleteClick}>
                                     <Trash2 className="w-4 h-4 mr-2" />
                                     Delete Event
                                 </DropdownMenuItem>
@@ -219,8 +220,8 @@ const EventCard = React.memo<EventCardProps>(({ event, username, is_public, onEv
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel className="cursor-pointer">Cancel</AlertDialogCancel>
-                        <Button variant="destructive" onClick={handleDeleteConfirm} disabled={deleteLoading} className="cursor-pointer">
-                            {deleteLoading ? "Deleting..." : "Delete"}
+                        <Button variant="destructive" onClick={handleDeleteConfirm} disabled={isPending} className="cursor-pointer">
+                            {isPending ? "Deleting..." : "Delete"}
                         </Button>
                     </AlertDialogFooter>
                 </AlertDialogContent>

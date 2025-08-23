@@ -1,4 +1,5 @@
 import { db } from "@/lib/db/prisma";
+import { error } from "@/lib/response";
 
 export const eventRepository = {
     create: (data: any) =>
@@ -67,14 +68,19 @@ export const eventRepository = {
             },
         }),
 
-    findUserEvents: (userId: string) =>
-        db.event.findMany({
-            where: { user_id: userId },
+    findUserEvents: async (userId: string) => {
+        const user = await db.user.findUnique({ where: { clerk_user_id: userId } });
+        if (!user) return error("User not found", 404, "Not Found");
+        const events = await db.event.findMany({
+            where: { user_id: user.id },
             orderBy: { created_at: "desc" },
             include: {
                 _count: { select: { bookings: true } },
             },
-        }),
+        });
+        const data = { events, username: user.username };
+        return data;
+    },
 
     delete: (eventId: string) =>
         db.event.delete({ where: { id: eventId } }),

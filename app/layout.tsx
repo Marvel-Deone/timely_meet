@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/common/Header";
-import Footer from "@/components/common/Footer";
 import {
   ClerkProvider
 } from '@clerk/nextjs';
@@ -10,6 +8,7 @@ import CreateEventDrawer from "@/components/ui/create-event";
 import { Suspense } from "react";
 import { Toaster } from "sonner";
 import { EventProvider } from "@/context/EventContext";
+import Providers from "./providers";
 
 export const metadata: Metadata = {
   title: "TimelyMeet",
@@ -23,6 +22,8 @@ const RootLayout = ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
+
+
   return (
     <html lang="en">
       <head>
@@ -33,13 +34,14 @@ const RootLayout = ({
         className={inter.className}
       >
         <ClerkProvider>
-          <EventProvider>
+          {/* <EventProvider> */}
+          <Providers>
             {children}
             <Toaster position="top-right" richColors />
             <Suspense fallback={null}>
               <CreateEventDrawer />
             </Suspense>
-          </EventProvider>
+          </Providers>
         </ClerkProvider>
       </body>
     </html>
