@@ -1,8 +1,8 @@
 import { eventService } from "@/lib/services/event.service";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 // GET /api/events/:eventId → get details of owned event
-export async function GET(req: Request, context: { params: { eventId: string } }) {
+export async function GET(req: NextRequest, context: { params: { eventId: string } }) {
     const { eventId } = context.params;
     const res = await eventService.getOwnedEventDetails(eventId);
 
@@ -15,7 +15,7 @@ export async function GET(req: Request, context: { params: { eventId: string } }
 }
 
 // PATCH /api/events/:eventId → update event
-export async function PATCH(req: Request, context: { params: { eventId: string } }) {
+export async function PATCH(req: NextRequest, context: { params: { eventId: string } }) {
     const { eventId } = context.params;
     const body = await req.json();
     const res = await eventService.updateUserEvent(eventId, body);
@@ -29,7 +29,7 @@ export async function PATCH(req: Request, context: { params: { eventId: string }
 }
 
 // DELETE /api/events/:eventId → delete event
-export async function DELETE(req: Request, context: { params: { eventId: string } }) {
+export async function DELETE(req: NextRequest, context: { params: { eventId: string } }) {
     const { eventId } = context.params;
     const res = await eventService.deleteUserEvent(eventId);
 
