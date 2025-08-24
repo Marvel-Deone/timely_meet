@@ -97,8 +97,6 @@ const UpcomingMeetings = () => {
         queryFn: () => fetchMeetings("upcoming"),
     });
 
-    console.log('meetingData:', data);
-    
     if (isLoading) return <p className="p-4">Loading...</p>;
     if (error) return <p className="p-4 text-red-500">Error loading meetings</p>;
     if (error) return (

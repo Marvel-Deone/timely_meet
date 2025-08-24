@@ -1,12 +1,12 @@
 import UserProfile from "@/app/[username]/_components/User-profile";
-import { findUserByUsername } from "@/lib/db/repositories/user.repository";
+import { userRepository } from "@/lib/db/repositories/user.repository";
 import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 export const generateMetadata = async ({ params }: { params: Promise<{ username: string }> }) => {
     const { username } = await params;
-    const user = await findUserByUsername(username);
+    const user = await userRepository.findUserByUsername(username);
 
     if (!user) {
         return {
@@ -22,7 +22,7 @@ export const generateMetadata = async ({ params }: { params: Promise<{ username:
 
 const UserPage = async ({ params }: { params: Promise<{ username: string }> }) => {
     const { username } = await params;
-    const user = await findUserByUsername(username);
+    const user = await userRepository.findUserByUsername(username);
 
     if (!user) {
         notFound();

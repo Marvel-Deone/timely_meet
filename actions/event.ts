@@ -40,7 +40,6 @@ export const getUserEvents = async () => {
 
         const user = await db.user.findUnique({ where: { clerk_user_id: userId } });
         if (!user) return error("User not found", 404, "Not Found");
-        console.log('My user:');
         const events = await db.event.findMany({
             where: { user_id: user.id },
             orderBy: { created_at: "desc" },

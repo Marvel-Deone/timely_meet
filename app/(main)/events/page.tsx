@@ -8,13 +8,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { RiseLoader } from "react-spinners";
-import { getUserEvents } from "@/actions/event";
+// import { getUserEvents } from "@/actions/event";
 import type { Event } from "@/lib/types/event.types";
 import Image from "next/image";
 import useFetch from "@/hooks/use-fetch";
 import EventCard from "@/components/dashboard/event-card";
-import { useEventContext } from "@/context/EventContext";
+// import { useEventContext } from "@/context/EventContext";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useUserEvents } from "@/lib/api/event.api";
+import Link from "next/link";
 
 type FilterType = "all" | "public" | "private" | "active";
 
@@ -34,10 +36,14 @@ const Events = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<FilterType>("all");
 
-  const { eventData: userEvents, loading, refetchEvents, error } = useEventContext();
-  useEffect(() => {
-    refetchEvents();
-  }, [refetchEvents]);
+  // const { eventData: userEvents, loading, refetchEvents, error } = useEventContext();
+  // useEffect(() => {
+  //   refetchEvents();
+  // }, [refetchEvents]);
+
+  // const { data, isLoading, error } = useUserEvents();
+
+  const { data: userEvents, isLoading, error, refetch } = useUserEvents();
 
   const processedData = useMemo(() => {
     if (!userEvents?.events) {
@@ -90,7 +96,7 @@ const Events = () => {
     setFilterType(filter)
   }, [])
 
-  if (loading) {
+  if (isLoading) {
     return <EventsLoading />
   }
 
@@ -110,10 +116,13 @@ const Events = () => {
               : "Get started by creating your first event"}
           </p>
           {!searchQuery && filterType === "all" && (
-            <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white">
-              <Plus className="w-4 h-4 mr-2" />
-              Create Your First Event
-            </Button>
+            <Link href={"/events?create=true"}>
+              <Button className="cursor-pointer bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white">
+                <Plus className="w-4 h-4 mr-2" />
+                Create Your First Event
+              </Button>
+
+            </Link>
           )}
         </CardContent>
       </Card>
@@ -160,7 +169,7 @@ const Events = () => {
         username={processedData.username}
         searchQuery={searchQuery}
         filterType={filterType}
-        onRefresh={() => refetchEvents(true)}
+        onRefresh={() => refetch()}
       />
     </div>
   )
