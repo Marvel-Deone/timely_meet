@@ -247,7 +247,6 @@ const DashboardPage = () => {
     const onSubmit = async (data: { username: string }) => {
         try {
             const response = await fn({ username: data.username });
-            console.log('Res:', response);
             if (response.success) {
                 toast.success("Username updated successfully!");
                 setIsEditing(false);

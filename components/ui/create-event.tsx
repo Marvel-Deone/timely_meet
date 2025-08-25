@@ -89,7 +89,17 @@ const CreateEventDrawer = () => {
 
     const onSubmit = useCallback(async (data: typeof eventSchema._type) => {
         try {
-            const res = isEditMode ? await updateEvent(data) : await createEvent(data);
+            // const res = isEditMode ? await updateEvent(eventId, data) : await createEvent(data);
+            if (isEditMode) {
+                if (!eventId) throw new Error("Event ID is missing for update.");
+                // const res = await updateEvent(eventId, data);
+                const res = await updateEvent({
+                    eventId: eventId,
+                    payload: data,
+                });
+            } else {
+                const res = await createEvent(data);
+            }
             toast.success(isEditMode ? "Event updated successfully" : "Event created successfully");
             // invalidate events list cache if there's any
             queryClient.invalidateQueries({ queryKey: ['events'] });

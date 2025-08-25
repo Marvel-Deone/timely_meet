@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 // GET /api/events/:eventId → get details of owned event
 export async function GET(req: NextRequest, context: any) {
-    const { eventId } = context.params as { eventId: string };
+    const { eventId } = await context.params as { eventId: string };
     const res = await eventService.getOwnedEventDetails(eventId);
 
     if (!res.success) {
@@ -16,7 +16,7 @@ export async function GET(req: NextRequest, context: any) {
 
 // PATCH /api/events/:eventId → update event
 export async function PATCH(req: NextRequest, context: any) {
-    const { eventId } = context.params as { eventId: string };
+    const { eventId } = await context.params as { eventId: string };
     const body = await req.json();
     const res = await eventService.updateUserEvent(eventId, body);
 
@@ -30,7 +30,7 @@ export async function PATCH(req: NextRequest, context: any) {
 
 // DELETE /api/events/:eventId → delete event
 export async function DELETE(req: NextRequest, context: any) {
-    const { eventId } = context.params as { eventId: string };
+    const { eventId } = await context.params as { eventId: string };
     const res = await eventService.deleteUserEvent(eventId);
 
     if (!res.success) {
