@@ -6,7 +6,6 @@ export const useUserEvents = () => {
         queryFn: async () => {
             const res = await fetch("/api/events");
             const data = await res.json();
-            console.log('data:dd', data.data);
 
             if (!res.ok || !data.success) throw new Error(data.error?.message || "Failed");
             return data.data;
@@ -26,7 +25,6 @@ export const useCreateEvent = () => {
             });
             const data = await res.json();
             if (!res.ok || !data.success) throw new Error(data.error?.message || "Failed");
-            console.log('reddsss:', res);
 
             return data.data;
         },
@@ -54,8 +52,15 @@ export const useUpdateUserEvent = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (payload: any) => {
-            const res = await fetch(`/api/events/${payload.id}`, {
+        // mutationFn: async (eventId: string, payload: any) => {
+        mutationFn: async ({
+            eventId,
+            payload,
+        }: {
+            eventId: string;
+            payload: any;
+        }) => {
+            const res = await fetch(`/api/events/${eventId}`, {
                 method: "PATCH",
                 body: JSON.stringify(payload),
                 headers: { "Content-Type": "application/json" },

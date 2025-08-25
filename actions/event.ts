@@ -36,7 +36,6 @@ export const getUserEvents = async () => {
         if (!userId) {
             return error("Unauthorized", 401, "Unauthorized");
         }
-        console.log('userId', userId);
 
         const user = await db.user.findUnique({ where: { clerk_user_id: userId } });
         if (!user) return error("User not found", 404, "Not Found");
@@ -49,13 +48,9 @@ export const getUserEvents = async () => {
                 },
             },
         });
-        console.log("Fetching Event");
         const data = { events, username: user.username };
-        console.log('Fetched');
-        console.log('Done');
         return success('User events fetched successfully', data);
     } catch (err: any) {
-        console.log('mydsdsg:', err);
         return error(err instanceof Error ? err.message : String(err), err instanceof Error && err.message ? 400 : 500, err instanceof Error && err.message ? "Bad Request" : "Internal Server Error");
     }
 }

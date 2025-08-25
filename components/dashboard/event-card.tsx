@@ -41,11 +41,6 @@ const EventCard = React.memo<EventCardProps>(({ event, username, is_public, onEv
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const router = useRouter();
 
-    // const { loading: deleteLoading, fn: fnDeleteEvent } = useFetchs(deleteUserEvent)
-    // const { loading: deleteLoading, fn: fnDeleteEvent } = useFetchs(
-    //     `/api/events/${event.id}`,
-    //     { method: "DELETE" }
-    // );
     const eventUrl = useMemo(() => `${username}/${event.id}`, [username, event.id]);
     const publicEventUrl = useMemo(() => `${window.location.origin}/${username}/${event.id}`, [event.id]);
     const colorClasses = useMemo(() => getColorClasses(generateEventColor(event)), [event]);

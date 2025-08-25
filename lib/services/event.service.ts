@@ -8,7 +8,6 @@ import { userRepository } from "../db/repositories/user.repository";
 export const eventService = {
     async createEvent(data: typeof eventSchema._input) {
         const { userId } = await auth();
-        console.log('clerk_user_id:', userId);
 
         if (!userId) return error("Unauthorized", 401);
 
@@ -26,10 +25,7 @@ export const eventService = {
         const { userId } = await auth();
         if (!userId) return error("Unauthorized", 401);
 
-        console.log('userId:', userId);
         const userEvents = await eventRepository.findUserEvents(userId);
-
-        console.log('Hi:', userEvents);
 
         return success("User events fetched successfully", userEvents);
     },
@@ -40,9 +36,9 @@ export const eventService = {
 
         const user = await userRepository.findUserById(userId);
         if (!user) return error("User not found", 404, "User not found");
-        
+
         const event = await eventRepository.findById(eventId);
-        if (!event || event.user_id !== user.id) return error("Event not found or unauthorized", 404);
+        if (!event || event.user_id !== user.id) return error("Event not found or unauthorized", 404, "Not Found");
 
         await eventRepository.delete(eventId);
         return success("Event deleted successfully", null);
@@ -67,8 +63,13 @@ export const eventService = {
         if (!userId) return error("Unauthorized", 401);
 
         const validatedData = eventSchema.parse(data);
-        const event = await eventRepository.findById(eventId);
-        if (!event || event.user_id !== userId) return error("Event not found or unauthorized", 404);
+        // Check User
+        const user = await userRepository.findUserById(userId);
+        if (!user) return error("User not found", 404, "User not found");
+
+        const event = await eventRepository.findByIdAndUser(eventId, userId);
+
+        if (!event || event.user_id !== user.id) return error("Event not found", 404, "Not Found");
 
         await eventRepository.update(eventId, validatedData);
         return success("Event updated successfully", null);

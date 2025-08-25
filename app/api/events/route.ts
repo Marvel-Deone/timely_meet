@@ -14,7 +14,6 @@ export async function GET() {
 export async function POST(req: Request) {
     const body = await req.json();
     const res = await eventService.createEvent(body);
-    console.log('hhhdhdhd', res);
 
     if (!res.success) {
         const status = (res as any).error.code || 400;
