@@ -164,7 +164,7 @@ const CreateEventDrawer = () => {
                                     <DialogClose asChild>
                                         <Button onClick={handleClose} variant="outline" className="cursor-pointer">Cancel</Button>
                                     </DialogClose>
-                                    <Button type="submit" disabled={isCreating || isUpdating} className='bg-blue-600 cursor-pointer hover:bg-blue-600'> {isCreating || isUpdating ? "Submitting..." : isEditMode ? "Update Event" : "Create Event"}</Button>
+                                    <Button type="submit" disabled={isCreating || isUpdating} className='bg-blue-600 cursor-pointer hover:bg-blue-600'> {isCreating ? "Submitting..." :  isUpdating ? 'Updating...' : isEditMode ? "Update Event" : "Create Event"}</Button>
                                 </DialogFooter>
                             </form>
                         }
