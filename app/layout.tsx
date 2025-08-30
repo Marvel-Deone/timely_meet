@@ -7,7 +7,6 @@ import {
 import CreateEventDrawer from "@/components/ui/create-event";
 import { Suspense } from "react";
 import { Toaster } from "sonner";
-import { EventProvider } from "@/context/EventContext";
 import Providers from "./providers";
 
 export const metadata: Metadata = {
@@ -34,7 +33,6 @@ const RootLayout = ({
         className={inter.className}
       >
         <ClerkProvider>
-          {/* <EventProvider> */}
           <Providers>
             {children}
             <Toaster position="top-right" richColors />
