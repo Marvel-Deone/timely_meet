@@ -1,7 +1,5 @@
 import { clerkClient, currentUser } from "@clerk/nextjs/server";
 import { db } from "./db/prisma";
-import { updateUsername } from "@/actions/user";
-
 
 export const checkUser = async () => {
     const user = await currentUser();

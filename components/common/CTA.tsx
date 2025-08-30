@@ -29,7 +29,7 @@ const CTA = () => {
                         <Link href="/dashboard">
                             <Button
                                 size="lg"
-                                className="bg-white text-blue-600 hover:bg-gray-100 px-10 py-4 text-lg font-bold shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 group"
+                                className="cursor-pointer bg-white text-blue-600 hover:bg-gray-100 px-10 py-4 text-lg font-bold shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 group"
                             >
                                 Start Free Today
                                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />

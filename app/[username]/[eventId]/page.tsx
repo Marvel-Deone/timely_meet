@@ -1,9 +1,10 @@
-import { getEventAvailability, getEventDetails } from "@/actions/event"
-import { notFound } from "next/navigation"
-import EventDetails from "./_components/event-details"
-import BookingForm from "./_components/booking-form"
-import { Suspense } from "react"
-import { Loader2 } from "lucide-react" // Using Lucide-React for icons
+import { notFound } from "next/navigation";
+import EventDetails from "./_components/event-details";
+import BookingForm from "./_components/booking-form";
+import { Suspense } from "react";
+import { Loader2 } from "lucide-react";
+import { eventRepository } from "@/lib/db/repositories/event.repository";
+import { eventService } from "@/lib/services/event.service";
 
 type Props = {
   params: {
@@ -14,7 +15,7 @@ type Props = {
 
 export const generateMetadata = async ({ params }: { params: Promise<{ username: string; eventId: string }> }) => {
   const { username, eventId } = await params
-  const event = await getEventDetails(username, eventId)
+  const event = await eventRepository.findByUsernameAndId(username, eventId);
 
   if (!event) {
     return { title: "Event not found" }
@@ -28,8 +29,8 @@ export const generateMetadata = async ({ params }: { params: Promise<{ username:
 
 const EventPage = async ({ params }: { params: Promise<{ username: string; eventId: string }> }) => {
   const { username, eventId } = await params
-  const event = await getEventDetails(username, eventId)
-  const availability = await getEventAvailability(eventId)
+  const event = await eventRepository.findByUsernameAndId(username, eventId);
+  const availability = await eventService.getEventAvailability(eventId);
 
   if (!event) {
     notFound()

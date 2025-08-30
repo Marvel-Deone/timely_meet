@@ -2,18 +2,13 @@
 
 import React, { Suspense } from "react";
 
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Calendar, Clock, Users, Plus, Search, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { RiseLoader } from "react-spinners";
-// import { getUserEvents } from "@/actions/event";
 import type { Event } from "@/lib/types/event.types";
-import Image from "next/image";
-import useFetch from "@/hooks/use-fetch";
 import EventCard from "@/components/dashboard/event-card";
-// import { useEventContext } from "@/context/EventContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useUserEvents } from "@/lib/api/event.api";
 import Link from "next/link";
@@ -36,14 +31,7 @@ const Events = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<FilterType>("all");
 
-  // const { eventData: userEvents, loading, refetchEvents, error } = useEventContext();
-  // useEffect(() => {
-  //   refetchEvents();
-  // }, [refetchEvents]);
-
-  // const { data, isLoading, error } = useUserEvents();
-
-  const { data: userEvents, isLoading, error, refetch } = useUserEvents();
+  const { data: userEvents, isLoading, error } = useUserEvents();
 
   const processedData = useMemo(() => {
     if (!userEvents?.events) {
@@ -67,7 +55,7 @@ const Events = () => {
       username: userEvents.username,
       stats,
     }
-  }, [userEvents])
+  }, [userEvents]);
 
   const filteredEvents = useMemo(() => {
     return processedData.events.filter((event) => {
@@ -169,7 +157,7 @@ const Events = () => {
         username={processedData.username}
         searchQuery={searchQuery}
         filterType={filterType}
-        onRefresh={() => refetch()}
+        // onRefresh={() => refetch()}
       />
     </div>
   )
@@ -251,13 +239,13 @@ const EventsGrid = React.memo<{
   username: string
   searchQuery: string
   filterType: FilterType
-  onRefresh: () => void
-}>(({ events, username, searchQuery, filterType, onRefresh }) => {
+  // onRefresh: () => void
+}>(({ events, username, searchQuery, filterType }) => {
   if (events.length > 0) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         {events.map((event) => (
-          <EventCard key={event.id} event={event} username={username} is_public={false} onEventDeleted={onRefresh} />
+          <EventCard key={event.id} event={event} username={username} is_public={false} />
         ))}
       </div>
     )

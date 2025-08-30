@@ -1,20 +1,19 @@
 "use client"
 
-import { bookingSchema } from "@/lib/utils/validators"
-import useFetch from "@/hooks/use-fetch"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { format } from "date-fns"
-import { DayPicker } from "react-day-picker"
-import "react-day-picker/style.css"
-import { useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
-import { Button } from "@/components/ui/button"
-import { createBooking } from "@/actions/booking"
-import { Input } from "@/components/ui/input"
+import { bookingSchema } from "@/lib/utils/validators";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { format } from "date-fns";
+import { DayPicker } from "react-day-picker";
+import "react-day-picker/style.css";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea"
-import { toast } from "sonner"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChevronLeft, CheckCircle, Loader2 } from "lucide-react"
+import { toast } from "sonner";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ChevronLeft, CheckCircle, Loader2 } from "lucide-react";
+import { useCreateBooking } from "@/lib/api/booking.api";
 
 interface AvailabilityItem {
   date: string
@@ -35,9 +34,10 @@ interface BookingFormData {
 }
 
 const BookingForm = ({ event, availability }: BookingFormProps) => {
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
-  const [selectedTime, setSelectedTime] = useState<string | null>(null)
-  const [step, setStep] = useState(1) // 1: Select Date, 2: Select Time, 3: Enter Details, 4: Confirmation
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [meetLink, setMeetLink] = useState<string | null>(null);
+  const [step, setStep] = useState(1); // 1: Select Date, 2: Select Time, 3: Enter Details, 4: Confirmation
 
   const {
     register,
@@ -66,7 +66,8 @@ const BookingForm = ({ event, availability }: BookingFormProps) => {
     }
   }, [selectedTime, setValue])
 
-  const { loading, data, fn: fnCreateBooking } = useFetch(createBooking)
+  // const { loading, data, fn: fnCreateBooking } = useFetch(createBooking)
+  const { mutateAsync: createBooking, isPending, data } = useCreateBooking();
 
   const onSubmit = async (formData: BookingFormData) => {
     if (!selectedDate || !selectedTime) {
@@ -77,26 +78,49 @@ const BookingForm = ({ event, availability }: BookingFormProps) => {
     const start_time = new Date(`${format(selectedDate, "yyyy-MM-dd")}T${selectedTime}`)
     const end_time = new Date(start_time.getTime() + event.duration * 60000)
 
-    const booking_data = {
-      eventId: event.id,
-      name: formData.name,
-      email: formData.email,
-      start_time: start_time.toISOString(),
-      end_time: end_time.toISOString(),
-      additional_info: formData.additional_info,
+    try {
+      const booking_data = {
+        eventId: event.id,
+        name: formData.name,
+        email: formData.email,
+        start_time: start_time.toISOString(),
+        end_time: end_time.toISOString(),
+        additional_info: formData.additional_info,
+      }
+
+      const res = await createBooking(booking_data);
+      console.log('data:', data, res, res.data.meet_link);
+      setMeetLink(res.data.meet_link);
+      toast.success("Booking successful! Check your email for details.");
+      setStep(4);
+      reset();
+      setSelectedDate(null);
+      setSelectedTime(null);
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to create booking.")
     }
 
-    const res = await fnCreateBooking(booking_data)
+    // const booking_data = {
+    //   eventId: event.id,
+    //   name: formData.name,
+    //   email: formData.email,
+    //   start_time: start_time.toISOString(),
+    //   end_time: end_time.toISOString(),
+    //   additional_info: formData.additional_info,
+    // }
 
-    if (res.success) {
-      toast.success("Booking successful! Check your email for details.")
-      setStep(4) // Move to confirmation step
-      reset() // Reset form fields
-      setSelectedDate(null)
-      setSelectedTime(null)
-    } else {
-      toast.error(res.error?.message || "Failed to create booking.")
-    }
+    // createBooking(booking_data, {
+    //   onSuccess: (res) => {
+    //     toast.success("Booking successful! Check your email for details.");
+    //     setStep(4);
+    //     reset();
+    //     setSelectedDate(null);
+    //     setSelectedTime(null);
+    //   },
+    //   onError: (error: any) => {
+
+    //   }
+    // });
   }
 
   const handleDateSelect = (date: Date | undefined) => {
@@ -186,7 +210,7 @@ const BookingForm = ({ event, availability }: BookingFormProps) => {
               day_range_middle: "aria-selected:bg-gray-100 aria-selected:text-gray-900",
               day_hidden: "invisible",
               day_range_start: "day-range-start",
-            //   day_selected_range_end: "day-range-end",
+              //   day_selected_range_end: "day-range-end",
             }}
           />
         )}
@@ -241,8 +265,8 @@ const BookingForm = ({ event, availability }: BookingFormProps) => {
               />
               {errors.additional_info && <p className="text-red-500 text-sm mt-1">{errors.additional_info.message}</p>}
             </div>
-            <Button type="submit" disabled={loading} className="w-full bg-blue-600 hover:bg-blue-700 text-white">
-              {loading ? (
+            <Button type="submit" disabled={isPending} className="cursor-pointer w-full bg-blue-600 hover:bg-blue-700 text-white">
+              {isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Scheduling...
@@ -260,16 +284,16 @@ const BookingForm = ({ event, availability }: BookingFormProps) => {
             <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-6" />
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Booking Confirmed!</h2>
             <p className="text-gray-700 mb-6">Your meeting for "{event.title}" has been successfully scheduled.</p>
-            {data.meet_link && (
+            {meetLink && (
               <p className="text-gray-700 mb-6">
                 You can join the meeting here:{" "}
                 <a
-                  href={data.meet_link}
+                  href={meetLink}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-600 hover:underline font-medium break-all"
                 >
-                  {data.meet_link}
+                  {meetLink}
                 </a>
               </p>
             )}
