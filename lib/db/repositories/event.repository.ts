@@ -9,12 +9,6 @@ export const eventRepository = {
         return db.event.findUnique({
             where: { id: eventId },
             include: {
-                // user: {
-                //   include: {
-                //     availability: true,
-                //     bookings: true,
-                //   },
-                // },
                 user: {
                     include: {
                         availability: {
@@ -33,7 +27,6 @@ export const eventRepository = {
                 },
             },
         });
-        //   db.event.findUnique({ where: { id: eventId } }),
     },
 
     findByIdAndUser: (eventId: string, userId: string) =>

@@ -32,16 +32,12 @@ import { formatMeetingTime } from "@/lib/common";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { fetchMeetings } from "@/lib/fetcher";
+import Link from "next/link";
 
 const recentEvents = [
     { name: "Team Standup", time: "9:00 AM", attendees: 5, status: "completed" },
     { name: "Client Review", time: "2:00 PM", attendees: 3, status: "upcoming" },
     { name: "Project Planning", time: "4:30 PM", attendees: 8, status: "upcoming" },
-]
-
-const upcomingMeetings = [
-    { title: "Design Review", time: "Tomorrow, 10:00 AM", participants: ["John", "Sarah", "Mike"] },
-    { title: "Sprint Planning", time: "Wed, 2:00 PM", participants: ["Team Alpha"] },
 ]
 
 const UpcomingMeetingsSkeleton = () => (
@@ -96,7 +92,7 @@ const UpcomingMeetings = () => {
         queryFn: () => fetchMeetings("upcoming"),
     });
 
-    if (isLoading) return <p className="p-4">Loading...</p>;
+    if (isLoading) return <UpcomingMeetingsSkeleton />;
     if (error) return <p className="p-4 text-red-500">Error loading meetings</p>;
     if (error) return (
         <Card className="bg-white border shadow-sm">
@@ -117,6 +113,8 @@ const UpcomingMeetings = () => {
     );
 
     const upcoming_meetings = data?.data || [];
+
+    const dashboard_meetings = upcoming_meetings.slice(0, 2);
 
     if (upcoming_meetings && upcoming_meetings.length === 0) {
         return (
@@ -148,13 +146,16 @@ const UpcomingMeetings = () => {
                         <Clock className="w-5 h-5 text-blue-600" />
                         Upcoming
                     </span>
-                    <Button variant="ghost" size="sm" className="text-xs">
-                        View All <ArrowRight className="w-3 h-3 ml-1" />
-                    </Button>
+                    <Link href="/meetings">
+                        <Button variant="ghost" size="sm" className="text-xs cursor-pointer">
+                            View All <ArrowRight className="w-3 h-3 ml-1" />
+                        </Button>
+                    </Link>
+
                 </CardTitle>
             </CardHeader>
             <CardContent className="p-4 md:p-6 pt-0 space-y-3">
-                {upcoming_meetings.map((meeting: any, index: number) => (
+                {dashboard_meetings.map((meeting: any, index: number) => (
                     <div key={index} className="p-3 bg-gray-50 rounded-lg border border-gray-100">
                         <div className="font-medium text-sm text-gray-900 mb-1">{meeting.event.title}</div>
                         <div className="text-xs text-gray-600 mb-2">{formatMeetingTime(meeting.start_time)}</div>

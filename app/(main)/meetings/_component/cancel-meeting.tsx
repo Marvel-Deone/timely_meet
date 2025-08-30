@@ -1,6 +1,5 @@
 "use client";
 
-import { cancelBooking } from "@/actions/booking";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -11,7 +10,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import useFetch from "@/hooks/use-fetch";
+import { useCancelBooking } from "@/lib/api/booking.api";
 import { Clock, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
@@ -23,28 +22,25 @@ interface CancelMeetingProps {
 
 const CancelMeeting = ({ bookingId }: CancelMeetingProps) => {
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
-  const { fn: fnCancelBooking, loading } = useFetch(cancelBooking);
 
   const router = useRouter();
+  const { mutate: cancelBooking, isPending } = useCancelBooking();
 
   const handleCancelClick = useCallback(() => {
     setIsCancelDialogOpen(true);
   }, []);
 
   const handleCancelConfirm = async () => {
-    try {
-      const res = await fnCancelBooking(bookingId);
-      if (res.success && "data" in res) {
-        toast.success(res.message || "Meeting cancelled successfully!");
+    cancelBooking(bookingId, {
+      onSuccess: () => {
+        toast.success("Meeting cancelled successfully!");
+        setIsCancelDialogOpen(false);
         router.refresh();
-      } else if ("error" in res) {
-        toast.error(res.error?.message || "Failed to cancel booking");
-      } else {
-        toast.error("Failed to cancel booking");
-      }
-    } catch (error) {
-      toast.error("An unexpected error occurred");
-    }
+      },
+      onError: (error: any) => {
+        toast.error(error?.message || "Failed to cancel booking")
+      },
+    });
   }
 
   return (
@@ -65,8 +61,8 @@ const CancelMeeting = ({ bookingId }: CancelMeetingProps) => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel className="cursor-pointer">Cancel</AlertDialogCancel>
-            <Button variant="destructive" onClick={handleCancelConfirm} disabled={loading} className="cursor-pointer">
-              {loading ? (
+            <Button variant="destructive" onClick={handleCancelConfirm} disabled={isPending} className="cursor-pointer">
+              {isPending ? (
                 <>
                   <Clock className="w-4 h-4 mr-2 animate-spin" />
                   Cancelling...

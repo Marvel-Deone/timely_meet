@@ -31,14 +31,7 @@ const Events = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<FilterType>("all");
 
-  // const { eventData: userEvents, loading, refetchEvents, error } = useEventContext();
-  // useEffect(() => {
-  //   refetchEvents();
-  // }, [refetchEvents]);
-
-  // const { data, isLoading, error } = useUserEvents();
-
-  const { data: userEvents, isLoading, error, refetch } = useUserEvents();
+  const { data: userEvents, isLoading, error } = useUserEvents();
 
   const processedData = useMemo(() => {
     if (!userEvents?.events) {
@@ -164,7 +157,7 @@ const Events = () => {
         username={processedData.username}
         searchQuery={searchQuery}
         filterType={filterType}
-        onRefresh={() => refetch()}
+        // onRefresh={() => refetch()}
       />
     </div>
   )
@@ -246,13 +239,13 @@ const EventsGrid = React.memo<{
   username: string
   searchQuery: string
   filterType: FilterType
-  onRefresh: () => void
-}>(({ events, username, searchQuery, filterType, onRefresh }) => {
+  // onRefresh: () => void
+}>(({ events, username, searchQuery, filterType }) => {
   if (events.length > 0) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         {events.map((event) => (
-          <EventCard key={event.id} event={event} username={username} is_public={false} onEventDeleted={onRefresh} />
+          <EventCard key={event.id} event={event} username={username} is_public={false} />
         ))}
       </div>
     )
