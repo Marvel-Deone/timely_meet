@@ -27,7 +27,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { usernameSchema } from "@/lib/utils/validators";
 import useFetch, { useFetchs } from "@/hooks/use-fetch";
-import { updateUsername } from "@/actions/user";
 import { toast } from "sonner";
 import { formatMeetingTime } from "@/lib/common";
 import Image from "next/image";
@@ -118,8 +117,6 @@ const UpcomingMeetings = () => {
     );
 
     const upcoming_meetings = data?.data || [];
-
-    // const upcoming_meetings: any[] = [];
 
     if (upcoming_meetings && upcoming_meetings.length === 0) {
         return (
@@ -235,7 +232,6 @@ const DashboardPage = () => {
     })
 
     const currentUsername = watch("username");
-    // const { loading, error, fn: fnUpdateUsername } = useFetch(updateUsername);
     const { data, loading, error, fn } = useFetchs("/api/user", { method: "POST" });
     useEffect(() => {
         if (typeof window !== "undefined" && isLoaded && user) {

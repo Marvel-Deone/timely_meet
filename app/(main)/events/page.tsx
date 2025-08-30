@@ -2,18 +2,13 @@
 
 import React, { Suspense } from "react";
 
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Calendar, Clock, Users, Plus, Search, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { RiseLoader } from "react-spinners";
-// import { getUserEvents } from "@/actions/event";
 import type { Event } from "@/lib/types/event.types";
-import Image from "next/image";
-import useFetch from "@/hooks/use-fetch";
 import EventCard from "@/components/dashboard/event-card";
-// import { useEventContext } from "@/context/EventContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useUserEvents } from "@/lib/api/event.api";
 import Link from "next/link";
@@ -67,7 +62,7 @@ const Events = () => {
       username: userEvents.username,
       stats,
     }
-  }, [userEvents])
+  }, [userEvents]);
 
   const filteredEvents = useMemo(() => {
     return processedData.events.filter((event) => {

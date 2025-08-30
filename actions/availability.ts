@@ -1,6 +1,5 @@
 'use server';
 
-import { DayOfWeek } from "@/lib/generated/prisma";
 import { db } from "@/lib/db/prisma";
 import { error, success } from "@/lib/response";
 import { auth } from "@clerk/nextjs/server";

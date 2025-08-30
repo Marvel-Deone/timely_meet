@@ -1,6 +1,5 @@
 "use client"
 
-import { updateUserAvailability } from "@/actions/availability"
 import { availabilitySchema } from "@/lib/utils/validators"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -8,12 +7,12 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import useFetch from "@/hooks/use-fetch"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Clock, Info, Save } from "lucide-react"
 import { Controller, useForm } from "react-hook-form"
 import { timeSlots } from "@/lib/const/availability.data"
 import { toast } from "sonner"
+import { useUpdateAvailability } from "@/lib/api/availability.api"
 
 type AvailabilityFormProps = {
     initialData: any
@@ -56,20 +55,16 @@ const AvailabilityForm = ({ initialData }: AvailabilityFormProps) => {
         defaultValues,
     });
 
-    const { fn: fnUpdateAvailability, loading } = useFetch(updateUserAvailability);
+    const { mutateAsync: updateAvailability, isPending } = useUpdateAvailability();
 
     const onSubmit = async (data: any) => {
         try {
-            const res = await fnUpdateAvailability(data)
-            if (res.success && "data" in res) {
-                toast.success(res.message || "Availability updated successfully!");
-            } else {
-                toast.error(("error" in res && res.error?.message) || "Failed to update availability");
-            }   
-        } catch (error) {
-            toast.error("An unexpected error occurred");
+            await updateAvailability(data);
+            toast.success("Availability updated successfully!");
+        } catch (err: any) {
+            toast.error(err.message || "Failed to update availability");
         }
-    }
+    };
 
     const availableDays = days.filter((day) => watch(`${day.key}.is_available`));
 
@@ -252,10 +247,10 @@ const AvailabilityForm = ({ initialData }: AvailabilityFormProps) => {
             <div className="flex justify-end">
                 <Button
                     type="submit"
-                    disabled={loading}
+                    disabled={isPending}
                     className="cursor-pointer bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8"
                 >
-                    {loading ? (
+                    {isPending ? (
                         <>
                             <Clock className="w-4 h-4 mr-2 animate-spin" />
                             Updating...
