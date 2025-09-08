@@ -71,8 +71,8 @@ export const eventService = {
 
         if (!event || event.user_id !== user.id) return error("Event not found", 404, "Not Found");
 
-        await eventRepository.update(eventId, validatedData);
-        return success("Event updated successfully", null);
+        const updatedEvent = await eventRepository.update(eventId, validatedData);
+        return success("Event updated successfully", updatedEvent);
     },
 
     async getEventAvailability(eventId: string) {

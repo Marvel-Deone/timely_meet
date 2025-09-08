@@ -12,13 +12,21 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-    const body = await req.json();
-    const res = await eventService.createEvent(body);
+    try {
+        const body = await req.json();
+        const res = await eventService.createEvent(body);
 
-    if (!res.success) {
-        const status = (res as any).error.code || 400;
-        return NextResponse.json(res, { status });
+        if (!res.success) {
+            const status = (res as any).error.code || 400;
+            return NextResponse.json(res, { status });
+        }
+
+        return NextResponse.json(res, { status: 201 });
+    } catch (err: any) {
+        console.error("API /events POST failed:", err);
+        return NextResponse.json(
+            { success: false, error: { message: err.message || "Invalid request" } },
+            { status: 500 }
+        )
     }
-
-    return NextResponse.json(res, { status: 201 });
 }

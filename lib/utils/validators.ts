@@ -15,14 +15,16 @@ export const usernameSchema = z.object({
 
 export const eventSchema = z.object({
     title: z
-    .string()
-    .min(1, "Title is required")
-    .max(100, "Title must be 100 characters or less"),
+        .string()
+        .min(1, "Title is required")
+        .max(100, "Title must be 100 characters or less"),
     description: z
-    .string()
-    .min(1, "Description is required")
-    .max(300, "Description must be 100 characters or less"),
+        .string()
+        .min(1, "Description is required")
+        .max(300, "Description must be 100 characters or less").optional(),
+    type: z.enum(["ONE_ON_ONE", "GROUP", "POLL", "ROUND_ROBIN", "COLLECTIVE"]),
     duration: z.number().int().positive("Duration must be a positive number"),
+    capacity: z.number().int().positive("Capacity must be a positive number").nullable().optional(), //it's required only for GROUP events
     is_private: z.boolean()
 });
 
@@ -40,10 +42,10 @@ export const daySchema = z.object({
     }
     return true;
 },
-{
-    message: "End time must be after start time",
-    path: ["end_time"]
-}
+    {
+        message: "End time must be after start time",
+        path: ["end_time"]
+    }
 );
 
 export const availabilitySchema = z.object({
