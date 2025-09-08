@@ -1,12 +1,13 @@
 "use client"
 
 // import { Calendar } from "@/components/ui/calendar"
-import { Search, Plus, Bell, Menu, X, Calendar } from "lucide-react"
+import { Search, Plus, Bell, Menu, X, Calendar, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import UserMenu from "../common/UserMenu"
 import Link from "next/link"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu"
 
 interface AppHeaderProps {
   onMobileMenuToggle?: () => void
@@ -52,12 +53,68 @@ const AppHeader = ({ onMobileMenuToggle, isMobileMenuOpen }: AppHeaderProps) => 
           </div>
 
           <div className="flex items-center gap-3">
-            <Link className="md:inline" href={"/events?create=true"}>
-              <Button className="cursor-pointer bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg">
-                <Plus className="w-4 h-4 mr-2 md:ml-2 lg:ml-0" />
-                <span className="hidden lg:inline">Create Event</span>
-              </Button>
-            </Link>
+            {/* <DropdownMenu>
+              <DropdownMenuTrigger asChild> */}
+                <Link className="md:inline" href={"/events?create=true"}>
+                <Button size={"lg"} className="cursor-pointer !py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg">
+                  <Plus className="w-4 h-4 mr-2 md:ml-2 lg:ml-0" />
+                  <span className="hidden lg:inline">Create Event</span>
+                  {/* <ChevronDown /> */}
+                </Button>
+                </Link>
+              {/* </DropdownMenuTrigger> */}
+              {/* <DropdownMenuContent align="end" className="px-3 mt-1">
+                <DropdownMenuLabel>Event Type</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild className="cursor-pointer mb-3">
+                  <Link className="md:inline" href={"/events?create=true"}>
+                    <div className="flex flex-col gap-2">
+                      <p className="text-[#004EBA] font-semibold">One-on-one</p>
+                      <div className="flex gap-1">
+                        1 host
+                        <span className="text-[#0A2540] b15h8fme cy3eodl c1ofs1m3" aria-hidden="true">
+                          <svg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg" role="img"><path d="M9.5 5h-9M7 2.5 9.5 5 7 7.5" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"></path></svg>
+                        </span>
+                        1 invitee
+                      </div>
+                      <p>Good for coffee chats, 1:1 interviews, etc.</p>
+                    </div>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer mb-3">
+                  <div className="flex flex-col gap-1">
+                    <p className="text-[#004EBA] font-semibold">Group</p>
+                    <div className="flex gap-2">
+                      1 host
+                      <span className="text-[#0A2540] b15h8fme cy3eodl c1ofs1m3" aria-hidden="true">
+                        <svg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg" role="img"><path d="M9.5 5h-9M7 2.5 9.5 5 7 7.5" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"></path></svg>
+                      </span>
+                      Multiple invitees
+                    </div>
+                    <p>Webinars, online classes, etc.</p>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer mb-3">
+                  <div className="flex flex-col gap-2">
+                    <p className="text-[#004EBA] font-semibold">Collective</p>
+                    <div className="flex gap-1">
+                      multiple hosts
+                      <span className="text-[#0A2540] b15h8fme cy3eodl c1ofs1m3" aria-hidden="true">
+                        <svg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg" role="img"><path d="M9.5 5h-9M7 2.5 9.5 5 7 7.5" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"></path></svg>
+                      </span>
+                      1 invitees
+                    </div>
+                    <p>Panel interviews, group sales calls, etc.</p>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer mb-3">
+                  <div className="flex flex-col gap-1">
+                    <p className="text-[#004EBA] font-semibold">Meeting Poll</p>
+                    <p>Let invitees vote on a time to meet</p>
+                  </div>
+                </DropdownMenuItem>
+              </DropdownMenuContent> */}
+            {/* </DropdownMenu> */}
 
             <Button variant="ghost" size="icon" className="relative cursor-pointer">
               <Bell className="w-4 h-4" />

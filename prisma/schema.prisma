@@ -5,8 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
-  output   = "../lib/generated/prisma"
+  provider      = "prisma-client-js"
+  output        = "../lib/generated/prisma"
   binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
@@ -16,38 +16,42 @@ datasource db {
 }
 
 model User {
-  id          String                @id @default(uuid())
-  clerk_user_id String                @unique
-  email       String                @unique
-  username    String                @unique
-  name        String?
-  image_url    String?
-  events      Event[]               @relation("UserEvents")
-  bookings    Booking[]             @relation("UserBookings")
-  availability  Availability[] 
-  created_at  DateTime              @default(now())
-  updated_at  DateTime              @updatedAt
+  id            String         @id @default(uuid())
+  clerk_user_id String         @unique
+  email         String         @unique
+  username      String         @unique
+  name          String?
+  image_url     String?
+  events        Event[]        @relation("UserEvents")
+  bookings      Booking[]      @relation("UserBookings")
+  availability  Availability[]
+  created_at    DateTime       @default(now())
+  updated_at    DateTime       @updatedAt
+  PollVote      PollVote[]
 }
 
 model Event {
-  id          String    @id @default(uuid())
+  id          String       @id @default(uuid())
   title       String
   description String?
   duration    Int
-  user_id      String
-  user        User      @relation("UserEvents", fields: [user_id], references: [id])
+  user_id     String
+  user        User         @relation("UserEvents", fields: [user_id], references: [id])
   bookings    Booking[]
-  is_private   Boolean   @default(true)
-  created_at  DateTime  @default(now())
-  updated_at  DateTime  @updatedAt
+  type        EventType    @default(ONE_ON_ONE)
+  capacity    Int? // null = unlimited, otherwise max attendees per slot
+  pollOptions PollOption[]
+  is_private  Boolean      @default(true)
+  created_at  DateTime     @default(now())
+  updated_at  DateTime     @updatedAt
 }
 
 model Booking {
   id              String   @id @default(uuid())
-  event_id         String
-  event           Event @relation(fields: [event_id], references: [id], onDelete: Cascade)
-  user_id          String
-  user            User @relation("UserBookings", fields: [user_id], references: [id])
+  event_id        String
+  event           Event    @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  user_id         String
+  user            User     @relation("UserBookings", fields: [user_id], references: [id])
   name            String
   email           String
   additional_info String?
@@ -59,23 +63,41 @@ model Booking {
   updated_at      DateTime @updatedAt
 }
 
+model PollOption {
+  id         String     @id @default(uuid())
+  event_id   String
+  event      Event      @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  start_time DateTime
+  end_time   DateTime
+  votes      PollVote[]
+}
+
+model PollVote {
+  id             String     @id @default(uuid())
+  poll_option_id String
+  pollOption     PollOption @relation(fields: [poll_option_id], references: [id], onDelete: Cascade)
+  user_id        String
+  user           User       @relation(fields: [user_id], references: [id])
+  created_at     DateTime   @default(now())
+}
+
 model Availability {
-  id String @id @default(uuid())
-  user_id String @unique
-  user User @relation(fields: [user_id], references: [id])
-  time_gap Int
-  days DayAvailability[] @relation("UserDayAvailability")
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  id         String            @id @default(uuid())
+  user_id    String            @unique
+  user       User              @relation(fields: [user_id], references: [id])
+  time_gap   Int
+  days       DayAvailability[] @relation("UserDayAvailability")
+  created_at DateTime          @default(now())
+  updated_at DateTime          @updatedAt
 }
 
 model DayAvailability {
-  id String @id @default(uuid())
+  id              String       @id @default(uuid())
   availability_id String
-  availability Availability @relation("UserDayAvailability", fields: [availability_id], references: [id], onDelete: Cascade)
-  day DayOfWeek
-  start_time DateTime
-  end_time DateTime
+  availability    Availability @relation("UserDayAvailability", fields: [availability_id], references: [id], onDelete: Cascade)
+  day             DayOfWeek
+  start_time      DateTime
+  end_time        DateTime
 }
 
 enum DayOfWeek {
@@ -86,4 +108,13 @@ enum DayOfWeek {
   FRIDAY
   SATURDAY
   SUNDAY
+}
+
+// Enum for event type
+enum EventType {
+  ONE_ON_ONE
+  GROUP
+  POLL
+  ROUND_ROBIN
+  COLLECTIVE
 }
