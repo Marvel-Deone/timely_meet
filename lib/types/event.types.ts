@@ -4,6 +4,7 @@ export type Event = {
     duration: number;
     is_private: boolean;
     description: string | null;
+    type: string;
     _count: {
         bookings: number;
     };

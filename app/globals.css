@@ -153,6 +153,10 @@
    transition: background-color 0.2s ease !important;
 }
 
+Button {
+  cursor: pointer !important;
+}
+
 @keyframes gradient {
   0%,
   100% {

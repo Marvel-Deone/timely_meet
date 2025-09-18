@@ -1,5 +1,3 @@
-import { time } from "console";
-import { title } from "process";
 import { z } from "zod";
 
 export const usernameSchema = z.object({
@@ -13,6 +11,12 @@ export const usernameSchema = z.object({
         )
 });
 
+const pollOptionSchema = z.object({
+    start_time: z.string().min(1, "Start time is required"),
+    end_time: z.string().min(1, "End time is required"),
+})
+
+
 export const eventSchema = z.object({
     title: z
         .string()
@@ -25,8 +29,31 @@ export const eventSchema = z.object({
     type: z.enum(["ONE_ON_ONE", "GROUP", "POLL", "ROUND_ROBIN", "COLLECTIVE"]),
     duration: z.number().int().positive("Duration must be a positive number"),
     capacity: z.number().int().positive("Capacity must be a positive number").nullable().optional(), //it's required only for GROUP events
-    is_private: z.boolean()
-});
+    is_private: z.boolean(),
+    poll_options: z.array(pollOptionSchema).optional()
+}).refine(
+    (data) => {
+        if (data.type === "POLL") {
+            return Array.isArray(data.poll_options) && data.poll_options.length >= 2
+        }
+        return true
+    },
+    {
+        message: "POLL events must have at least 2 time options",
+        path: ["poll_options"],
+    },
+).refine(
+    (data) => {
+        if (["GROUP", "ROUND_ROBIN", "COLLECTIVE"].includes(data.type)) {
+            return data.capacity && data.capacity > 0
+        }
+        return true
+    },
+    {
+        message: "This event type requires a capacity",
+        path: ["capacity"],
+    },
+);
 
 export const daySchema = z.object({
     is_available: z.boolean(),

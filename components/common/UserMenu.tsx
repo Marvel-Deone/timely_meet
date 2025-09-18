@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { UserButton } from '@clerk/nextjs'
+import { UserButton } from '@clerk/nextjs';
 import { ChartNoAxesGantt, Settings } from 'lucide-react';
-import React from 'react'
+import React from 'react';
 
 const UserMenu = () => {
     return (

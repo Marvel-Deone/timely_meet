@@ -3,7 +3,22 @@ import { error } from "@/lib/response";
 
 export const eventRepository = {
     create: (data: any) =>
-        db.event.create({ data }),
+        // db.event.create({ data })
+        db.event.create({
+            data: {
+                title: data.title,
+                description: data.description,
+                type: data.type,
+                duration: data.duration,
+                capacity: data.capacity,
+                is_private: data.is_private,
+                user_id: data.user_id,
+                poll_options: data.poll_options
+                    ? { create: data.poll_options }
+                    : undefined,
+            },
+        }),
+
 
     findById: (eventId: string) => {
         return db.event.findUnique({
@@ -21,6 +36,12 @@ export const eventRepository = {
                             select: {
                                 start_time: true,
                                 end_time: true,
+                                event: {
+                                    select: {
+                                        type: true,
+                                        capacity: true
+                                    },
+                                },
                             },
                         },
                     },
@@ -58,6 +79,14 @@ export const eventRepository = {
                         image_url: true,
                     },
                 },
+                poll_options: {
+                    select: {
+                        id: true,
+                        event_id: true,
+                        start_time: true,
+                        end_time: true
+                    }
+                }
             },
         }),
 

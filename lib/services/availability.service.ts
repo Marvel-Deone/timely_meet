@@ -45,8 +45,6 @@ export const availabilityService = {
     },
 
     async updateUserAvailability(data: { time_gap: number, [key: string]: any }) {
-        console.log('data:', data);
-
         const { userId } = await auth();
         if (!userId) return error("Unauthorized", 401);
 
@@ -57,7 +55,6 @@ export const availabilityService = {
 
         const availability_data = Object.entries(data).filter(([key]) => key !== "time_gap").flatMap(([daySchema, { is_available, start_time, end_time }]) => {
             const day = dayKeyToEnum[daySchema as keyof typeof dayKeyToEnum];
-            console.log('day:', day);
 
             if (is_available && day) {
                 base_date = new Date().toISOString().split('T')[0];
