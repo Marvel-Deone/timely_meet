@@ -17,14 +17,36 @@ export const useCreateBooking = () => {
         throw new Error(json.error?.message || "Booking creation failed");
       }
 
-      console.log('res.ko:', json);
-      
+      return json.data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["bookings"] });
+    },
+  });
+};
+
+// Create poll vote
+export const useCreatePollVote = () => {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (payload: any) => {
+      const res = await fetch("/api/poll-vote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.error?.message || "Poll vote creation failed");
+      }
 
       return json.data;
     },
-    // Optional: refetch bookings if you’re listing them
+    // refetch poll votes
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["bookings"] });
+      qc.invalidateQueries({ queryKey: ["pollVotes"] });
     },
   });
 };

@@ -1,7 +1,7 @@
 import { eventSchema } from "@/lib/utils/validators";
 import { error, success } from "@/lib/response";
 import { auth } from "@clerk/nextjs/server";
-import { addDays, addMinutes, format, isBefore, parseISO, startOfDay } from "date-fns";
+import { addDays, addMinutes, endOfDay, format, isBefore, parseISO, startOfDay } from "date-fns";
 import { eventRepository } from "../db/repositories/event.repository";
 import { userRepository } from "../db/repositories/user.repository";
 
@@ -10,9 +10,7 @@ export const eventService = {
         const { userId } = await auth();
 
         if (!userId) return error("Unauthorized", 401);
-
         const validatedData = eventSchema.parse(data);
-
         const user = await userRepository.findUserById(userId);
 
         if (!user) return error("User not found", 404, "User not found");
@@ -62,16 +60,24 @@ export const eventService = {
         const { userId } = await auth();
         if (!userId) return error("Unauthorized", 401);
 
+        console.log('user:', userId);
+
         const validatedData = eventSchema.parse(data);
+        console.log('Validation success:', validatedData);
+
         // Check User
         const user = await userRepository.findUserById(userId);
         if (!user) return error("User not found", 404, "User not found");
+        console.log('Got user');
 
         const event = await eventRepository.findByIdAndUser(eventId, userId);
+        console.log('Event Found', event);
 
         if (!event || event.user_id !== user.id) return error("Event not found", 404, "Not Found");
 
         const updatedEvent = await eventRepository.update(eventId, validatedData);
+        console.log('Event updated:', updatedEvent);
+
         return success("Event updated successfully", updatedEvent);
     },
 
@@ -96,13 +102,18 @@ export const eventService = {
 
                 const dateStr = format(date, "yyyy-MM-dd");
 
+                // Only allow supported event types for slot generation
+                const allowedTypes = ["ONE_ON_ONE", "GROUP", "POLL"] as const;
+                const safeEventType = allowedTypes.includes(event.type as any) ? event.type as "ONE_ON_ONE" | "GROUP" | "POLL" : "ONE_ON_ONE";
                 const slots = generateDayAvailableSlots(
                     specific_day.start_time,
                     specific_day.end_time,
                     event.duration,
                     bookings,
                     dateStr,
-                    day_avail.time_gap
+                    day_avail.time_gap,
+                    safeEventType,
+                    event.type === "GROUP" ? event.capacity || Infinity : Infinity,
                 );
 
                 if (slots.length > 0) {
@@ -120,7 +131,9 @@ function generateDayAvailableSlots(
     duration: number,
     bookings: any[],
     dateStr: string,
-    timeGap = 0
+    timeGap = 0,
+    event_type: "ONE_ON_ONE" | "GROUP" | "POLL" = "ONE_ON_ONE",
+    group_capacity: number = Infinity
 ) {
     const slots: string[] = [];
     const start = parseISO(`${dateStr}T${format(start_time, "HH:mm")}`);
@@ -129,26 +142,63 @@ function generateDayAvailableSlots(
     const now = new Date();
 
     if (format(now, "yyyy-MM-dd") === dateStr) {
-        const adjusted_now = addMinutes(now, timeGap);
+        let adjusted_now = addMinutes(now, timeGap);
+        adjusted_now = alignToDuration(adjusted_now, duration);
         if (isBefore(current_time, adjusted_now)) current_time = adjusted_now;
     }
+    // Pre-filter bookings to those overlapping this date
+    const dayStart = startOfDay(parseISO(dateStr));
+    const dayEnd = endOfDay(parseISO(dateStr));
+    const dayBookings = bookings
+        .map(b => ({ start: new Date(b.start_time), end: new Date(b.end_time), event: b.event }))
+        .filter(b => b.end > dayStart && b.start < dayEnd);
 
     while (current_time < end) {
         const slot_end = addMinutes(current_time, duration);
         if (slot_end > end) break;
 
-        const isAvailable = !bookings.some((booking) => {
-            const booking_start = new Date(booking.start_time);
-            const booking_end = new Date(booking.end_time);
-            return (
-                (current_time >= booking_start && current_time < booking_end) ||
-                (slot_end > booking_start && slot_end <= booking_end) ||
-                (current_time <= booking_start && slot_end >= booking_end)
-            );
-        });
+        // Get bookings overlapping this slot
+        const overlappingBookings = dayBookings.filter(b =>
+            (current_time >= b.start && current_time < b.end) ||
+            (slot_end > b.start && slot_end <= b.end) ||
+            (current_time <= b.start && slot_end >= b.end)
+        );
 
-        if (isAvailable) slots.push(format(current_time, "HH:mm"));
+        let isAvailable = false;
+        if (event_type === "ONE_ON_ONE") {
+            // Only free if no overlaps
+            isAvailable = overlappingBookings.length === 0;
+        } else if (event_type === "GROUP") {
+            // Free if current group capacity is not exceeded
+            const groupBookings = overlappingBookings.filter(b => b.event?.type === "GROUP");
+            isAvailable = groupBookings.length < group_capacity;
+        } else if (event_type === "POLL") {
+            // Poll slots are always available?
+            isAvailable = true;
+        }
+
+        if (isAvailable) {
+            slots.push(format(current_time, "HH:mm"));
+        }
+
+        const overlaps = dayBookings.some(b => (
+            (current_time >= b.start && current_time <= b.end) ||
+            (slot_end > b.start && slot_end <= b.end) ||
+            (current_time <= b.start && slot_end >= b.end)
+        ));
+
+        if (!overlaps) {
+            slots.push(format(current_time, "HH:mm"));
+        }
         current_time = addMinutes(current_time, duration);
     }
     return slots;
 }
+
+function alignToDuration(date: Date, duration: number) {
+    const minutes = date.getMinutes();
+    const remainder = minutes % duration;
+    if (remainder === 0) return date; // already aligned
+    return addMinutes(date, duration - remainder); // ceil to next multiple
+}
+

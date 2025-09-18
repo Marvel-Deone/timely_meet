@@ -25,6 +25,7 @@ import { Skeleton } from "./skeleton";
 import { Badge } from "./badge";
 import { Calendar, Users, Vote, RotateCcw, UserCheck, ArrowLeft, ArrowRight } from "lucide-react";
 import { Textarea } from "./textarea";
+import { toLocalInputValue } from "@/lib/common";
 
 type EventType = "ONE_ON_ONE" | "GROUP" | "POLL" | "ROUND_ROBIN" | "COLLECTIVE";
 
@@ -33,16 +34,6 @@ interface PollOption {
     start_time: string
     end_time: string
 }
-
-// interface ExtendedEventData {
-//   title: string
-//   description?: string
-//   duration: number
-//   is_private: boolean
-//   event_type: EventType
-//   capacity?: number
-//   poll_options?: PollOption[]
-// }
 
 const eventTypes = [
     {
@@ -66,20 +57,20 @@ const eventTypes = [
         icon: Vote,
         features: ["Multiple time options", "Voting system"],
     },
-    {
-        type: "ROUND_ROBIN" as EventType,
-        label: "Round Robin",
-        description: "Sequential meetings with participants",
-        icon: RotateCcw,
-        features: ["Rotating schedule", "Set capacity"],
-    },
-    {
-        type: "COLLECTIVE" as EventType,
-        label: "Collective",
-        description: "Large group collaborative event",
-        icon: Calendar,
-        features: ["High capacity", "Collaborative"],
-    },
+    // {
+    //     type: "ROUND_ROBIN" as EventType,
+    //     label: "Round Robin",
+    //     description: "Sequential meetings with participants",
+    //     icon: RotateCcw,
+    //     features: ["Rotating schedule", "Set capacity"],
+    // },
+    // {
+    //     type: "COLLECTIVE" as EventType,
+    //     label: "Collective",
+    //     description: "Large group collaborative event",
+    //     icon: Calendar,
+    //     features: ["High capacity", "Collaborative"],
+    // },
 ]
 
 const CreateEventDrawer = () => {
@@ -127,31 +118,33 @@ const CreateEventDrawer = () => {
 
         const newOption: PollOption = {
             id: `option-${Date.now()}`,
-            start_time: startTime.toISOString().slice(0, 16),
-            end_time: endTime.toISOString().slice(0, 16),
+            start_time: startTime.toISOString(),
+            // start_time: startTime.toISOString().slice(0, 16),
+            end_time: endTime.toISOString(),
+            // end_time: endTime.toISOString().slice(0, 16),
         }
 
-        setPollOptions([...pollOptions, newOption])
+        setPollOptions([...pollOptions, newOption]);
     }
 
     const removePollOption = (id: string) => {
-        setPollOptions(pollOptions.filter((option) => option.id !== id))
+        setPollOptions(pollOptions.filter((option) => option.id !== id));
     }
 
     const updatePollOption = (id: string, field: "start_time" | "end_time", value: string) => {
-        setPollOptions(pollOptions.map((option) => (option.id === id ? { ...option, [field]: value } : option)))
+        setPollOptions(pollOptions.map((option) => (option.id === id ? { ...option, [field]: value } : option)));
     }
 
     const handleClose = () => {
         setIsOpen(false)
-        setSelectedEventType("ONE_ON_ONE")
-        setPollOptions([])
-        setCurrentStep(1)
+        setSelectedEventType("ONE_ON_ONE");
+        setPollOptions([]);
+        setCurrentStep(1);
         const params = new URLSearchParams(window.location.search);
-        ["create", "edit", "id"].forEach((key) => params.delete(key))
+        ["create", "edit", "id"].forEach((key) => params.delete(key));
 
-        const newQuery = params.toString()
-        router.replace(`/events${newQuery ? `?${newQuery}` : ""}`)
+        const newQuery = params.toString();
+        router.replace(`/events${newQuery ? `?${newQuery}` : ""}`);
     }
 
     const nextStep = async () => {
@@ -167,7 +160,7 @@ const CreateEventDrawer = () => {
 
     const prevStep = () => {
         if (currentStep > 1) {
-            setCurrentStep(currentStep - 1)
+            setCurrentStep(currentStep - 1);
         }
     }
 
@@ -176,9 +169,6 @@ const CreateEventDrawer = () => {
     const canProceedToNext = () => {
         if (currentStep === 1) return true;
         if (currentStep === 2) {
-            // console.log('dddd', values);
-            // return values.title && values.title.trim().length > 0
-            //  return Object.keys(errors).length === 0; // only proceed if no validation errors
             return (
                 values.title?.trim().length > 0 &&
                 // values.description?.trim().length > 0 &&
@@ -210,9 +200,6 @@ const CreateEventDrawer = () => {
 
     const onSubmit = useCallback(
         async (data: typeof eventSchema._type) => {
-            // const eventValues = getValues();
-            console.log( 'data', data, 'Form submitted', values);
-
             try {
                 const eventData = {
                     ...data,
@@ -228,13 +215,11 @@ const CreateEventDrawer = () => {
                     })
                 } else {
                     const res = await createEvent(eventData);
-                    console.log('redgg:', res);
                 }
                 toast.success(isEditMode ? "Event updated successfully" : "Event created successfully")
                 reset()
                 handleClose()
             } catch (err: any) {
-                console.log("errvvv:", err)
                 toast.error(err.message || "An unexpected error occurred:")
             }
         },
@@ -428,7 +413,7 @@ const CreateEventDrawer = () => {
                         </Card>
                     ) : (
                         <div className="space-y-3">
-                            {pollOptions.map((option, index) => (
+                            {pollOptions.map((option: any, index: any) => (
                                 <Card key={option.id} className="p-4">
                                     <div className="flex items-center gap-3">
                                         <div className="flex-1 grid grid-cols-2 gap-3">
@@ -436,7 +421,7 @@ const CreateEventDrawer = () => {
                                                 <label className="text-xs text-gray-500">Start Time</label>
                                                 <Input
                                                     type="datetime-local"
-                                                    value={option.start_time}
+                                                    value={toLocalInputValue(option.start_time)}
                                                     onChange={(e) => updatePollOption(option.id, "start_time", e.target.value)}
                                                     className="mt-1"
                                                 />
@@ -445,7 +430,7 @@ const CreateEventDrawer = () => {
                                                 <label className="text-xs text-gray-500">End Time</label>
                                                 <Input
                                                     type="datetime-local"
-                                                    value={option.end_time}
+                                                    value={toLocalInputValue(option.end_time)}
                                                     onChange={(e) => updatePollOption(option.id, "end_time", e.target.value)}
                                                     className="mt-1"
                                                 />
@@ -456,7 +441,7 @@ const CreateEventDrawer = () => {
                                             variant="outline"
                                             size="sm"
                                             onClick={() => removePollOption(option.id)}
-                                            className="text-red-600 hover:text-red-700"
+                                            className="text-red-600 hover:text-red-700 mt-6 !py-2"
                                         >
                                             Remove
                                         </Button>
@@ -521,7 +506,7 @@ const CreateEventDrawer = () => {
                             <FormLoading />
                         ) : (
                             <>
-                                <form className="flex flex-col gap-6" onSubmit={handleSubmit(onSubmit)}>
+                                <form className="flex flex-col gap-6">
                                     {currentStep === 1 && renderEventTypeStep()}
                                     {currentStep === 2 && renderDetailsStep()}
                                     {currentStep === 3 && renderConfigurationStep()}

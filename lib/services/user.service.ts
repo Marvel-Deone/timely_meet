@@ -15,7 +15,6 @@ export async function updateUsername(userId: string, username: string) {
 
     return success("User profile updated successfully", null);
   } catch (err) {
-    console.error("Service Error:", err);
     return error("Internal server error", 500, "Internal Server Error");
   }
 }
@@ -30,7 +29,6 @@ export async function getUserProfile(username: string) {
 
     return success("User profile fetched successfully", user);
   } catch (err) {
-    console.error("Service Error:", err);
     return error("Internal server error", 500, "Internal Server Error");
   }
 }

@@ -31,7 +31,6 @@ const EventPage = async ({ params }: { params: Promise<{ username: string; event
   const { username, eventId } = await params
   const event = await eventRepository.findByUsernameAndId(username, eventId);
   const availability = await eventService.getEventAvailability(eventId);
-
   if (!event) {
     notFound()
   }

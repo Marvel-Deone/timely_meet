@@ -15,11 +15,6 @@ import Link from "next/link";
 
 type FilterType = "all" | "public" | "private" | "active";
 
-interface EventsResponse {
-  events: Event[]
-  username: string
-}
-
 interface EventStats {
   total: number
   totalBookings: number

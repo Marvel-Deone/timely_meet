@@ -23,7 +23,6 @@ export async function POST(req: Request) {
 
         return NextResponse.json(res, { status: 201 });
     } catch (err: any) {
-        console.error("API /events POST failed:", err);
         return NextResponse.json(
             { success: false, error: { message: err.message || "Invalid request" } },
             { status: 500 }
