@@ -1,10 +1,22 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-export const useUserEvents = () => {
+export const useUserEvents = (params?: {
+    type?: "ONE_ON_ONE" | "GROUP" | "POLL" | "ROUND_ROBIN" | "COLLECTIVE";
+    status?: "active" | "completed" | "cancelled";
+}) => {
     return useQuery({
-        queryKey: ["events"],
+        queryKey: ["events", params],
         queryFn: async () => {
-            const res = await fetch("/api/events");
+            const searchParams = new URLSearchParams();
+            if (params?.type) {
+                searchParams.append('type', params.type);
+            }
+            if (params?.status) {
+                searchParams.append('status', params.status);
+            }
+            const queryString = searchParams.toString();
+            const url = `/api/events${queryString ? `?${queryString}` : ''}`;
+            const res = await fetch(url);
             const data = await res.json();
 
             if (res.status == 401) {
@@ -92,7 +104,6 @@ export const useUpdateUserEvent = () => {
         },
     });
 };
-
 
 export const useDeleteUserEvent = () => {
     const queryClient = useQueryClient();

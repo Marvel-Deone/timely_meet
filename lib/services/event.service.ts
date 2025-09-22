@@ -19,15 +19,44 @@ export const eventService = {
         return success("Event created successfully", event);
     },
 
-    async getUserEvents() {
-        const { userId } = await auth();
-        if (!userId) return error("Unauthorized", 401);
+    // async getUserEvents(params?: {
+    //     type?: "ONE_ON_ONE" | "GROUP" | "POLL" | "ROUND_ROBIN" | "COLLECTIVE";
+    //     status?: "active" | "completed" | "cancelled";
+    // }) {
+    //     const { userId } = await auth();
+    //     if (!userId) return error("Unauthorized", 401);
+    //     console.log('psarams_service:', params);
+        
 
-        const userEvents = await eventRepository.findUserEvents(userId);
+    //     const userEvents = await eventRepository.findUserEvents(userId, params);
 
-        return success("User events fetched successfully", userEvents);
-    },
+    //     return success("User events fetched successfully", userEvents);
+    // },
+async getUserEvents(params?: { type?: string; status?: string }) {
+  const { userId } = await auth();
+  if (!userId) return error("Unauthorized", 401);
 
+  // Define allowed enums
+  const allowedTypes = ["ONE_ON_ONE", "GROUP", "POLL", "ROUND_ROBIN", "COLLECTIVE"] as const;
+  const allowedStatuses = ["active", "completed", "cancelled"] as const;
+
+  // Start building safe params
+  const safeParams: {
+    type?: typeof allowedTypes[number];
+    status?: typeof allowedStatuses[number];
+  } = {};
+
+  if (params?.type && allowedTypes.includes(params.type as any)) {
+    safeParams.type = params.type as typeof allowedTypes[number];
+  }
+
+  if (params?.status && allowedStatuses.includes(params.status as any)) {
+    safeParams.status = params.status as typeof allowedStatuses[number];
+  }
+
+  const userEvents = await eventRepository.findUserEvents(userId, safeParams);
+  return success("User events fetched successfully", userEvents);
+},
     async deleteUserEvent(eventId: string) {
         const { userId } = await auth();
         if (!userId) return error("Unauthorized", 401);

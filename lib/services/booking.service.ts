@@ -85,7 +85,6 @@ export const bookingService = {
         try {
             const poll_options = await db.pollOption.findUnique({
                 where: { id: pollVoteData.poll_option_id },
-                // include: { user: true },
             });
             console.log('poll_options:', poll_options);
 
@@ -147,6 +146,15 @@ export const bookingService = {
         }
     },
 
+    // getPollVotes: async () => {
+    //     const { userId } = await auth();
+    //     if (!userId) return error("Unauthorized", 401);
+
+    //     const userEvents = await eventRepository.findUserEvents(userId);
+
+    //     return success("User events fetched successfully", userEvents);
+    // },
+    
     cancelBooking: async (bookingId: string) => {
         try {
             const { userId } = await auth();

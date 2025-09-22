@@ -85,21 +85,62 @@ export const eventRepository = {
                         event_id: true,
                         start_time: true,
                         end_time: true
-                    }
-                }
+                    },
+                },
             },
         }),
 
-    findUserEvents: async (userId: string) => {
+    findUserEvents: async (userId: string, params?: {
+        type?: string;
+        status?: string;
+    }) => {
         const user = await db.user.findUnique({ where: { clerk_user_id: userId } });
         if (!user) return error("User not found", 404, "Not Found");
-        const events = await db.event.findMany({
-            where: { user_id: user.id },
-            orderBy: { created_at: "desc" },
-            include: {
-                _count: { select: { bookings: true } },
-            },
-        });
+        // where with optional filters
+        const whereClause: any = { user_id: user.id };
+        console.log('paramsss:', params);
+
+        console.log('Hi');
+
+        if (params?.type) {
+            console.log('Hello');
+
+            whereClause.type = params.type;
+            console.log('params type:', params, params?.type);
+        }
+
+        if (params?.status) {
+            whereClause.status = params.status;
+        }
+
+        let events;
+
+        if (params?.type && params.type === "POLL") {
+            events = await db.event.findMany({
+                where: whereClause,
+                orderBy: { created_at: "desc" },
+                include: {
+                    poll_options: {
+                        select: {
+                            id: true,
+                            event_id: true,
+                            start_time: true,
+                            end_time: true
+                        },
+                    },
+                    _count: { select: { bookings: true } },
+                },
+            });
+        } else {
+            events = await db.event.findMany({
+                where: whereClause,
+                orderBy: { created_at: "desc" },
+                include: {
+                    _count: { select: { bookings: true } },
+                },
+            });
+        }
+
         const data = { events, username: user.username };
         return data;
     },
