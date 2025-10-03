@@ -19,12 +19,29 @@ export const eventService = {
         return success("Event created successfully", event);
     },
 
-    async getUserEvents() {
+    async getUserEvents(params?: { type?: string; status?: string }) {
         const { userId } = await auth();
         if (!userId) return error("Unauthorized", 401);
 
-        const userEvents = await eventRepository.findUserEvents(userId);
+        // Define allowed enums
+        const allowedTypes = ["ONE_ON_ONE", "GROUP", "POLL", "ROUND_ROBIN", "COLLECTIVE"] as const;
+        const allowedStatuses = ["active", "completed", "cancelled"] as const;
 
+        // Start building safe params
+        const safeParams: {
+            type?: typeof allowedTypes[number];
+            status?: typeof allowedStatuses[number];
+        } = {};
+
+        if (params?.type && allowedTypes.includes(params.type as any)) {
+            safeParams.type = params.type as typeof allowedTypes[number];
+        }
+
+        if (params?.status && allowedStatuses.includes(params.status as any)) {
+            safeParams.status = params.status as typeof allowedStatuses[number];
+        }
+
+        const userEvents = await eventRepository.findUserEvents(userId, safeParams);
         return success("User events fetched successfully", userEvents);
     },
 
@@ -43,7 +60,19 @@ export const eventService = {
     },
 
     async getEventDetails(username: string, eventId: string) {
-        return await eventRepository.findByUsernameAndId(username, eventId);
+        const event = await eventRepository.findByUsernameAndId(username, eventId);
+        if (!event) return error("Unauthorized or not found", 404);
+        console.log('EventD:', event);
+        console.log('Not:', event.poll_options.length);
+
+        if (event.poll_options && event.status === "finalized") {
+            console.log('Hinbnddnn:', event.poll_options.length);
+            let finalized_time = event.poll_options.find(option => option.id === event.finalized_option_id) || null;
+            const data = { ...event, finalized_time }
+            return success("Event details fetched successfully", data);
+        }
+
+        return success("Event details fetched successfully", event);
     },
 
     async getOwnedEventDetails(eventId: string) {
@@ -56,27 +85,29 @@ export const eventService = {
         return success("Event details fetched successfully", event);
     },
 
-    async updateUserEvent(eventId: string, data: typeof eventSchema._input) {
+    async getPollEventDetails(eventId: string) {
         const { userId } = await auth();
         if (!userId) return error("Unauthorized", 401);
 
-        console.log('user:', userId);
+        const event = await eventRepository.findPollEventById(eventId, userId);
+        if (!event) return error("Unauthorized or not found", 404);
 
+        return success("Poll event details fetched successfully", event);
+    },
+
+    async updateUserEvent(eventId: string, data: typeof eventSchema._input) {
+        const { userId } = await auth();
+        if (!userId) return error("Unauthorized", 401);
         const validatedData = eventSchema.parse(data);
-        console.log('Validation success:', validatedData);
 
         // Check User
         const user = await userRepository.findUserById(userId);
         if (!user) return error("User not found", 404, "User not found");
-        console.log('Got user');
 
         const event = await eventRepository.findByIdAndUser(eventId, userId);
-        console.log('Event Found', event);
 
         if (!event || event.user_id !== user.id) return error("Event not found", 404, "Not Found");
-
         const updatedEvent = await eventRepository.update(eventId, validatedData);
-        console.log('Event updated:', updatedEvent);
 
         return success("Event updated successfully", updatedEvent);
     },

@@ -18,11 +18,19 @@ export const availabilityService = {
         if (!userId) return error("Unauthorized", 401);
 
         const user = await availabilityRepository.findByUserId(userId);
-        if (!user?.availability?.length) return null;
+        console.log('user availability:', user);
+
+        if (!user?.availability?.length)
+            return success("User availability fetched successfully", null);
+        console.log('hyere:', user);
+        console.log('UserAvailabilty', user);
+        console.log("Days:", user.availability[0].days);
 
         const avail = user.availability[0];
+        console.log('avail:', avail);
         const { time_gap, days } = avail;
         const result = { time_gap } as any;
+        console.log('I am here ooo');
 
         [
             "monday",
@@ -40,8 +48,7 @@ export const availabilityService = {
                 end_time: found ? found.end_time.toISOString().slice(11, 16) : "17:00",
             };
         });
-
-        return result;
+        return success("User availability fetched successfully", result);
     },
 
     async updateUserAvailability(data: { time_gap: number, [key: string]: any }) {

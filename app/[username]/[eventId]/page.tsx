@@ -28,8 +28,12 @@ export const generateMetadata = async ({ params }: { params: Promise<{ username:
 }
 
 const EventPage = async ({ params }: { params: Promise<{ username: string; eventId: string }> }) => {
-  const { username, eventId } = await params
-  const event = await eventRepository.findByUsernameAndId(username, eventId);
+  const { username, eventId } = await params;
+  const eventD = await eventService.getEventDetails(username, eventId);
+  let event;
+  if (eventD.success) event = eventD?.data;
+
+  // const event = await eventRepository.findByUsernameAndId(username, eventId);
   const availability = await eventService.getEventAvailability(eventId);
   if (!event) {
     notFound()

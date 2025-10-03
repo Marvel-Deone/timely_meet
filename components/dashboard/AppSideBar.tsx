@@ -1,12 +1,13 @@
 "use client"
 
-import { Calendar, Clock, BarChart3, Video } from "lucide-react"
+import { Calendar, Clock, BarChart3, Video, ListChecks } from "lucide-react"
 import { usePathname } from "next/navigation";
 
 const sidebarItems = [
   { title: "Dashboard", icon: BarChart3, href: "/dashboard", isActive: true },
   { title: "Events", icon: Calendar, href: "/events" },
   { title: "Meetings", icon: Video, href: "/meetings" },
+  { title: "Polls", icon: ListChecks, href: "/polls" },
   { title: "Availability", icon: Clock, href: "/availability" },
 ]
 
