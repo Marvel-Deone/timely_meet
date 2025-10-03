@@ -20,19 +20,15 @@ interface PollEvent {
         id: string
         start_time: string
         end_time: string
-        votes: number
+        _count: { votes: number }
     }>
 }
 
 const Polls = () => {
-    // const [pollEvents, setPollEvents] = useState<PollEvent[]>([]);
-    const [loading, setLoading] = useState(true);
     let pollEvents: PollEvent[] = [];
-
     const { data, isLoading, error } = useUserEvents({ type: "POLL" });
     pollEvents = data?.events ?? [];
 
-    console.log('pollEvents:', pollEvents);
     if (isLoading) {
         return (
             <div className="container mx-auto p-6">
@@ -89,7 +85,7 @@ const Polls = () => {
                                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                                         <div className="flex items-center gap-1">
                                             <Users className="w-4 h-4" />
-                                            <span>{event.totalVotes} votes</span>
+                                            <span>{event.poll_options.reduce((sum, option) => sum + (option._count.votes || 0), 0)} votes</span>
                                         </div>
                                         <div className="flex items-center gap-1">
                                             <Clock className="w-4 h-4" />
@@ -104,7 +100,7 @@ const Polls = () => {
                                         <div className="text-sm bg-muted/50 rounded-md p-2">
                                             {(() => {
                                                 const mostPopular = event.poll_options.reduce((prev, current) =>
-                                                    prev.votes > current.votes ? prev : current,
+                                                    prev._count.votes > current._count.votes ? prev : current,
                                                 )
                                                 return (
                                                     <div className="flex justify-between items-center">
@@ -116,7 +112,7 @@ const Polls = () => {
                                                             })}
                                                         </span>
                                                         <Badge variant="outline" className="text-xs">
-                                                            {mostPopular.votes} votes
+                                                            {mostPopular._count.votes} votes
                                                         </Badge>
                                                     </div>
                                                 )
@@ -125,7 +121,7 @@ const Polls = () => {
                                     )}
                                 </div>
 
-                                <Link href={`/dashboard/polls/${event.id}`}>
+                                <Link href={`/polls/${event.id}`}>
                                     <Button className="w-full bg-transparent" variant="outline">
                                         View Results
                                     </Button>

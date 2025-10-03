@@ -31,19 +31,21 @@ model User {
 }
 
 model Event {
-  id          String       @id @default(uuid())
-  title       String
-  description String?
-  duration    Int
-  user_id     String
-  user        User         @relation("UserEvents", fields: [user_id], references: [id])
-  bookings    Booking[]
-  type        EventType    @default(ONE_ON_ONE)
-  capacity    Int? // null = unlimited, otherwise max attendees per slot
+  id           String       @id @default(uuid())
+  title        String
+  description  String?
+  duration     Int
+  user_id      String
+  user         User         @relation("UserEvents", fields: [user_id], references: [id])
+  bookings     Booking[]
+  type         EventType    @default(ONE_ON_ONE)
+  capacity     Int? // null = unlimited, otherwise max attendees per slot
   poll_options PollOption[]
-  is_private  Boolean      @default(true)
-  created_at  DateTime     @default(now())
-  updated_at  DateTime     @updatedAt
+  status       EventStatus  @default(finalized)
+  finalized_option_id String?
+  is_private   Boolean      @default(true)
+  created_at   DateTime     @default(now())
+  updated_at   DateTime     @updatedAt
 }
 
 model Booking {
@@ -75,9 +77,9 @@ model PollOption {
 model PollVote {
   id             String     @id @default(uuid())
   poll_option_id String
-  poll_option     PollOption @relation(fields: [poll_option_id], references: [id], onDelete: Cascade)
-  voter_name        String
-  voter_email        String
+  poll_option    PollOption @relation(fields: [poll_option_id], references: [id], onDelete: Cascade)
+  voter_name     String
+  voter_email    String
   // user           User       @relation(fields: [user_id], references: [id])
   created_at     DateTime   @default(now())
 }
@@ -118,4 +120,9 @@ enum EventType {
   POLL
   ROUND_ROBIN
   COLLECTIVE
+}
+
+enum EventStatus {
+  pending
+  finalized
 }

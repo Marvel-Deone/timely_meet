@@ -57,18 +57,68 @@ export const useCreateEvent = () => {
     });
 };
 
-
 export const useEventById = (eventId: string) => {
     return useQuery({
         queryKey: ["event", eventId],
         queryFn: async () => {
             const res = await fetch(`/api/events/${eventId}`);
             const data = await res.json();
-            if (!res.ok || !data.success) throw new Error(data.error?.message || "Failed to fetch event");
+            if (!res.ok || !data.success) throw new Error(data.error?.message || "Failed to fetch event details");
             return data.data;
         },
         enabled: !!eventId, // only run when id is available
     });
+};
+
+export const usePollEventById = (eventId: string) => {
+    return useQuery({
+        queryKey: ["pollEvent", eventId],
+        queryFn: async () => {
+            const res = await fetch(`/api/events/${eventId}/polls`);
+            const data = await res.json();
+            if (!res.ok || !data.success) throw new Error(data.error?.message || "Failed to fetch poll event details");
+            return data.data;
+        },
+        enabled: !!eventId, // only run when id is available
+    });
+};
+
+// export const useFinalizeEventTime = (eventId: string) => {
+//     return useQuery({
+//         queryKey: ["finalizeEventTime", eventId],
+//         queryFn: async () => {
+//             const res = await fetch(`/api/events/${eventId}/polls`);
+//             const data = await res.json();
+//             if (!res.ok || !data.success) throw new Error(data.error?.message || "Failed to fetch poll event details");
+//             return data.data;
+//         },
+//         enabled: !!eventId, // only run when id is available
+//     });
+// };
+
+export const useFinalizeEventTime = () => {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (payload: any) => {
+      const res = await fetch(`/api/events/${payload.eventId}/polls`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.error?.message || "Finalizing time failed");
+      }
+
+      return json.data;
+    },
+    // refetch poll votes
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["finalizeTime"] });
+    },
+  });
 };
 
 export const useUpdateUserEvent = () => {
@@ -122,5 +172,3 @@ export const useDeleteUserEvent = () => {
         },
     });
 };
-
-

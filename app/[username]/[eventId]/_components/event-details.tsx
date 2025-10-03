@@ -15,6 +15,7 @@ interface EventDetailsProps {
     created_at: Date
     updated_at: Date
     title: string
+    status: "pending" | "finalized"
     description: string | null
     duration: number
     user_id: string
@@ -27,6 +28,12 @@ interface EventDetailsProps {
       end_time: Date
       votes?: number
     }>
+    finalized_time?: {
+      id: string
+      start_time?: Date
+      end_time?: Date
+      votes?: number
+    }
     user: {
       name: string | null
       email: string
@@ -88,8 +95,44 @@ const EventDetails = ({ event }: EventDetailsProps) => {
             </span>
           </div>
         )}
+        {(event.type === "POLL" && event.status === "finalized" && event.finalized_time) && (
+          <div className="space-y-2">
+            <div className="flex items-center text-gray-700">
+              <Vote className="mr-3 h-5 w-5 text-purple-600" />
+              <span className="font-medium">Date & Time:</span>
+            </div>
+            <div className="ml-8 space-y-2">
+              <div className="flex items-center justify-between px-2 bg-gray-50 rounded-md">
+                {(event.finalized_time.start_time && event.finalized_time.end_time) && (
+                  <div className="flex flex-col gap-2 ">
+                    <div className="font-medium text-gray-700 text-sm">
+                      {format(new Date(event.finalized_time.start_time), "PPP")}
+                    </div>
+                    <div className="text-sm opacity-75">
+                      {format(new Date(event.finalized_time.start_time), "p")} - {format(new Date(event.finalized_time.end_time), "p")}
+                    </div>
+                  </div>
+                )
+                }
 
-        {event.type === "POLL" && event.poll_options && event.poll_options.length > 0 && (
+                {/* <span className="text-sm text-gray-700">
+                  {event.finalized_time.start_time
+                    ? format(new Date(event.finalized_time.start_time), "yyyy-MM-dd HH:mm")
+                    : "N/A"} -{" "}
+                  {event.finalized_time.end_time
+                    ? format(new Date(event.finalized_time.end_time), "yyyy-MM-dd HH:mm")
+                    : "N/A"}
+                </span> */}
+                {event.finalized_time.votes !== undefined && (
+                  <Badge variant="secondary" className="text-xs">
+                    {event.finalized_time.votes} votes
+                  </Badge>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+        {(event.status !== "finalized") && event.type === "POLL" && event.poll_options && event.poll_options.length > 0 && (
           <div className="space-y-2">
             <div className="flex items-center text-gray-700">
               <Vote className="mr-3 h-5 w-5 text-purple-600" />

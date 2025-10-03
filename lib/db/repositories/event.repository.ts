@@ -1,4 +1,5 @@
 import { db } from "@/lib/db/prisma";
+import { Prisma } from "@/lib/generated/prisma";
 import { error } from "@/lib/response";
 
 export const eventRepository = {
@@ -63,6 +64,52 @@ export const eventRepository = {
                         image_url: true,
                     },
                 },
+                  poll_options: {
+                    select: {
+                        id: true,
+                        event_id: true,
+                        start_time: true,
+                        end_time: true,
+                        votes: {
+                            select: {
+                                id: true,
+                                voter_name: true,
+                                voter_email: true,
+                            },
+                        },
+                    },
+                },
+            },
+        }),
+
+    findPollEventById: (eventId: string, userId: string) =>
+        db.event.findFirst({
+            where: { id: eventId, user: { clerk_user_id: userId } },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        username: true,
+                        image_url: true,
+                    },
+                },
+                poll_options: {
+                    select: {
+                        id: true,
+                        event_id: true,
+                        start_time: true,
+                        end_time: true,
+                        votes: {
+                            select: {
+                                id: true,
+                                voter_name: true,
+                                voter_email: true,
+                            },
+                        },
+                    },
+                },
             },
         }),
 
@@ -98,15 +145,8 @@ export const eventRepository = {
         if (!user) return error("User not found", 404, "Not Found");
         // where with optional filters
         const whereClause: any = { user_id: user.id };
-        console.log('paramsss:', params);
-
-        console.log('Hi');
-
         if (params?.type) {
-            console.log('Hello');
-
             whereClause.type = params.type;
-            console.log('params type:', params, params?.type);
         }
 
         if (params?.status) {
@@ -125,7 +165,8 @@ export const eventRepository = {
                             id: true,
                             event_id: true,
                             start_time: true,
-                            end_time: true
+                            end_time: true,
+                             _count: { select: { votes: true } },
                         },
                     },
                     _count: { select: { bookings: true } },
@@ -143,6 +184,46 @@ export const eventRepository = {
 
         const data = { events, username: user.username };
         return data;
+    },
+
+    finalizeEvent: (tx: Prisma.TransactionClient, eventId: string, optionId: string) => {
+        return tx.event.update({
+            where: { id: eventId },
+            data: {
+                status: "finalized",
+                finalized_option_id: optionId,
+            },
+            include: {
+                poll_options: {
+                    select: {
+                        id: true,
+                        event_id: true,
+                        start_time: true,
+                        end_time: true,
+                        votes: {
+                            select: {
+                                id: true,
+                                voter_name: true,
+                                voter_email: true,
+                            },
+                        },
+                    }
+                },
+                user: true,
+            },
+        });
+    },
+
+    attachMeetLink: (
+        tx: Prisma.TransactionClient,
+        eventId: string,
+        meetLink: string,
+        googleEventId: string
+    ) => {
+        return tx.booking.updateMany({
+            where: { event_id: eventId },
+            data: { meet_link: meetLink, google_event_id: googleEventId },
+        });
     },
 
     delete: (eventId: string) =>

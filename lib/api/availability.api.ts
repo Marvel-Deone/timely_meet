@@ -5,7 +5,9 @@ export const useAvailability = () => {
         queryKey: ["availability"],
         queryFn: async () => {
             const res = await fetch("/api/availability");
+            
             const json = await res.json();
+            console.log('resdd:', json);
             if (!res.ok || !json.success) throw new Error(json.error?.message || "Fetch failed");
             return json.data;
         },
@@ -23,6 +25,7 @@ export const useUpdateAvailability = () => {
             });
 
             const json = await res.json();
+            console.log('json:', json);
 
             if (!res.ok || !json.success) throw new Error(json.error?.message || "Update failed");
             return json.data;

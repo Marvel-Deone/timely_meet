@@ -14,13 +14,14 @@ import { useAvailability } from "@/lib/api/availability.api";
 
 export default function AvailabilityClient() {
     const { data: availability, isLoading, isError } = useAvailability();
+    console.log('dhhh:', availability);
 
     if (isLoading) {
-        return <p className="text-gray-600">Loading availability...</p>;
-    }
-
-    if (isError) {
-        return <p className="text-red-600">Failed to load availability.</p>;
+        return <div className="container mx-auto p-6">
+            <div className="flex items-center justify-center h-64">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+            </div>
+        </div>
     }
 
     return (

@@ -92,11 +92,6 @@ const EventCard = React.memo<EventCardProps>(({ event, username, is_public, onEv
   const bookingCount = useMemo(() => event._count?.bookings || 0, [event._count?.bookings])
   const isActive = useMemo(() => bookingCount > 0, [bookingCount])
 
-  // const eventTypeInfo = useMemo(
-  //   () => eventTypeConfig[event.type as keyof typeof eventTypeConfig] || eventTypeConfig.ONE_ON_ONE,
-  //   [event.type],
-  // )
-
   const { mutateAsync: deleteUserEvent, isPending } = useDeleteUserEvent()
 
   const handleCardClick = useCallback(
